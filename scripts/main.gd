@@ -29,6 +29,7 @@ var bg: TextureRect
 var bg2: TextureRect
 var battle: Control
 var enemy: Actor
+var enemy_pool := {}  # "legacy" -> Actor, rig id -> SkelActor (see docs/SKELETAL.md)
 var hero: Actor
 var hero_holder: Node2D
 var pet_spr: Sprite2D
@@ -172,7 +173,9 @@ func _build() -> void:
 		var sh := _sprite("res://assets/ui/dot.png", Vector2(420, 70)); sh.stretch_mode = TextureRect.STRETCH_SCALE
 		sh.position = x - Vector2(210, 30); sh.modulate = Color(0, 0, 0, 0.45); battle.add_child(sh)
 	# enemy
-	enemy = Actor.new(); enemy.position = ENEMY_FEET; battle.add_child(enemy)
+	enemy = Actor.new(); enemy.position = ENEMY_FEET; battle.add_child(enemy); enemy_pool["legacy"] = enemy
+	for rid in Rigs.SKELETAL:
+		var sa := SkelActor.new(rid); sa.position = ENEMY_FEET; sa.visible = false; battle.add_child(sa); enemy_pool[rid] = sa
 	enemy.setup(tex("res://assets/sprites/slime.png"), Vector2(560, 560))
 	# hero + aura + pet
 	hero_holder = Node2D.new(); hero_holder.position = HERO_FEET; battle.add_child(hero_holder)
@@ -180,7 +183,7 @@ func _build() -> void:
 	aura_fx.position = Vector2(-20, -180); aura_fx.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE; aura_fx.emission_sphere_radius = 150
 	aura_fx.gravity = Vector2(0, -160); aura_fx.initial_velocity_min = 10; aura_fx.initial_velocity_max = 60
 	aura_fx.scale_amount_min = 0.3; aura_fx.scale_amount_max = 0.7; hero_holder.add_child(aura_fx)
-	hero = Actor.new(); hero_holder.add_child(hero)
+	hero = SkelActor.new("hero"); hero_holder.add_child(hero)
 	hero.setup(tex("res://assets/sprites/hero_body.png"), Vector2(470, 400))
 	hero.breathe_amp = 0.022; hero.breathe_speed = 2.2; hero.bob = 3.0
 	hero.set_param("rim_color", Color(1.0, 0.85, 0.55)); hero.set_param("rim_dir", Vector2(0.7, -0.7)); hero.set_param("cape", 0.6)
@@ -337,6 +340,9 @@ func spawn() -> void:
 	elif boss: id = BOSSES[(G.stage / 5) % BOSSES.size()]
 	else: id = MOBS[b][randi() % 3]
 	enemy_id = id
+	var want: Actor = enemy_pool.get(id, enemy_pool["legacy"])
+	if want != enemy:
+		enemy.visible = false; enemy = want; enemy.visible = true
 	var big := boss or raid
 	enemy.position = ENEMY_FEET + (Vector2(20, 0) if big else Vector2.ZERO)
 	enemy.setup(tex("res://assets/sprites/%s.png" % id), Vector2(700, 700) if big else Vector2(560, 560), tex("res://assets/wounds/%s.png" % id))
@@ -362,10 +368,13 @@ func _boss_entrance() -> void:
 	boss_left = G.boss_time() if boss else float(G.K.raid.seconds)
 	play("boss")
 	enemy.modulate = Color(0, 0, 0, 0)
-	enemy.scale = Vector2(0.4, 0.4)
 	var tw := create_tween().set_parallel()
 	tw.tween_property(enemy, "modulate", Color.WHITE, 0.6)
-	tw.tween_property(enemy, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if enemy is SkelActor and enemy.has_clip("entrance"):
+		enemy.scale = Vector2.ONE; enemy.entrance()
+	else:
+		enemy.scale = Vector2(0.4, 0.4)
+		tw.tween_property(enemy, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(vignette, "modulate:a", 0.8, 0.3)
 	tw.chain().tween_property(vignette, "modulate:a", 0.25, 0.8)
 	_banner(G.tr_("raid_title") if raid else G.tr_("boss"), Color(0.8, 0.5, 1) if raid else Color(1, 0.3, 0.25))
@@ -373,6 +382,7 @@ func _boss_entrance() -> void:
 
 ## Boss roar: anticipation (rear back), then a lunge toward the hero with a screen jolt.
 func _roar() -> void:
+	if enemy is SkelActor: enemy.play_clip("attack")
 	enemy.lean_target = -0.12; enemy.squash_target = -0.08
 	var tw := create_tween(); tw.tween_interval(0.35)
 	tw.tween_callback(func():
@@ -523,6 +533,8 @@ func kill() -> void:
 	drip_fx.emitting = false
 	enemy.kick(900, 3.0, -2.5, -400)
 	var tw := enemy.create_tween()
+	if enemy is SkelActor and enemy.has_clip("death"):
+		enemy.die(); tw.tween_interval(0.25)
 	tw.tween_method(func(v: float): enemy.set_param("dissolve", v), 0.0, 1.0, 0.5)
 	if boss:
 		var was: int = G.max_stage
