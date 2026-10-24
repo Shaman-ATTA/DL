@@ -10,7 +10,7 @@ class_name Rigs
 const SKELETAL := ["goblin", "boss_lich"]   # enemy ids that use SkelActor; others stay on Actor
 
 const HERO := {
-	"cell": 13, "hand": "weapon", "jiggle": {"k": 90.0, "c": 7.0, "gain": 0.0022},
+	"cell": 13, "amp": 1.55, "z": {"cape1": -4, "cape2": -4, "leg_bu": -3, "leg_bl": -3, "foot_b": -3, "hips": 0, "leg_fu": 0, "leg_fl": 0, "foot_f": 0, "chest": 1, "head": 2, "arm_u": 3, "arm_l": 4, "hand": 5}, "hand": "weapon", "jiggle": {"k": 90.0, "c": 7.0, "gain": 0.0022},
 	"bones": [
 		["hips", "", 290, 300, 290, 255, 1.0, ""],
 		["chest", "hips", 290, 262, 300, 150, 1.25, ""],
@@ -83,7 +83,7 @@ const HERO := {
 }
 
 const GOBLIN := {
-	"cell": 13, "jiggle": {"k": 80.0, "c": 6.0, "gain": 0.0026},
+	"cell": 13, "amp": 1.5, "z": {"leg_lu": -1, "leg_ll": -1, "leg_ru": -1, "leg_rl": -1, "hips": 0, "cloth": 1, "chest": 0, "arm_bu": 1, "arm_bl": 1, "head": 2, "ear": 3, "axe": 3, "axe2": 3, "arm_au": 3, "arm_al": 4}, "jiggle": {"k": 80.0, "c": 6.0, "gain": 0.0026},
 	"bones": [
 		["hips", "", 420, 480, 420, 430, 1.0, ""],
 		["chest", "hips", 420, 435, 400, 300, 1.3, ""],
@@ -143,7 +143,7 @@ const GOBLIN := {
 }
 
 const LICH := {
-	"cell": 13, "jiggle": {"k": 55.0, "c": 4.5, "gain": 0.003},
+	"cell": 13, "amp": 1.5, "z": {"foot_l": -1, "foot_r": -1, "hips": 0, "robe_l": 0, "robe_r": 0, "robe_c": 0, "chest": 1, "arm_cu": 1, "arm_cl": 1, "head": 2, "flame": 2, "staff_t": 3, "staff_b": 3, "arm_su": 4, "arm_sl": 4, "hand_s": 5}, "jiggle": {"k": 55.0, "c": 4.5, "gain": 0.003},
 	"bones": [
 		["hips", "", 250, 470, 250, 405, 1.0, ""],
 		["chest", "hips", 240, 420, 222, 290, 1.4, ""],

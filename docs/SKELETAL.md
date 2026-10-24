@@ -1,4 +1,12 @@
-# Skeletal (cutout) animation — pilot (v1.3.0)
+# Skeletal (cutout) animation (v1.4.0: separate parts)
+
+## v1.4 change: cutout parts instead of one skinned mesh
+- `tools/cut_parts.py` splits the original sprite into one PNG per bone (`assets/parts/<id>/`), using the same bone segments as rigs.gd. Near each joint, the part drawn *below* gets the area hidden under the part above painted in (nearest-colour fill, blurred, darkened like an occlusion shadow). The part above gets a 3 px real-pixel feather. White background leftovers baked into the goblin and lich sprites are removed. It also writes `scripts/part_rects.gd` (rect and z per part).
+- SkelActor creates one Sprite2D per part under a single `Parts` node, sorted by (z, bone order), and each part follows its bone through RemoteTransform2D. This avoids z_index fighting with the rest of the scene.
+- Every part has its own ShaderMaterial. The `region` uniform maps the part's UV back to full-sprite UV, so wounds and the dissolve noise stay on the right body part. The rim light uses the full-sprite silhouette (`full_tex`), so cut edges do not glow.
+- Bone rotations in clips are scaled by the rig's `amp` (hero 1.55, monsters 1.5). The root and weapon bones are not scaled. `hit_l` is a 40 % copy of `hit` and plays on normal taps.
+- After changing bones or z in rigs.gd, re-run `python3 tools/cut_parts.py`, then `godot45 --headless --import`.
+
 
 ## Abstraction
 - `Actor` (scripts/actor.gd): the legacy character. It is a single sprite with shader-driven breathing, springs, wounds and dissolve. It still drives every character that is not rigged.
@@ -27,5 +35,5 @@ Estimates (per character, including tuning):
 | pets (each) | 0.5–1 h | small, few bones |
 
 ## Known limitations
-- A single mesh means there are no hidden pixels behind limbs. Large rotations stretch the neighbouring art, so clips keep rotations moderate.
+- The parts are cut from the original art, not redrawn. The painted-in joint areas are smeared colour fills and look like soft dark blobs when a part rotates far (most visible on the lich's head in hit/death).
 - Not yet profiled on a real device.

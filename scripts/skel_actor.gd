@@ -14,7 +14,9 @@ var rig_id := ""
 var R: Dictionary
 var body: Node2D        # springs
 var root: Node2D        # animated root
-var poly: Polygon2D
+var poly: Polygon2D     # unused since v1.4 (parts); kept for API compatibility
+var parts := {}          # bone -> Sprite2D cutout part
+var mats: Array[ShaderMaterial] = []
 var skel: Skeleton2D
 var bones := {}
 var joint := {}         # bone -> texture px joint
@@ -41,9 +43,9 @@ func setup(texture: Texture2D, box: Vector2, wound: Texture2D = null) -> void:
 	var s: float = min(box.x / tex_size.x, box.y / tex_size.y)
 	if body == null or abs(s - sc) > 0.001: _build(texture, s)
 	size = (tex_size * sc).round()
-	mat.set_shader_parameter("wound_tex", wound)
+	set_param("wound_tex", wound)
 	set_wounds(0.0, 0.0, 0.0)
-	mat.set_shader_parameter("dissolve", 0.0)
+	set_param("dissolve", 0.0)
 	dead = false; atk_t = -1.0; _bb_pending = true
 	for k in jig: jig[k] = [0.0, 0.0, Vector2.ZERO, Vector2.ZERO]
 	play_clip("idle", 0.0)
@@ -58,10 +60,8 @@ func _build(texture: Texture2D, s: float) -> void:
 	sc = s; origin = Vector2(tex_size.x * 0.5, tex_size.y)
 	body = Node2D.new(); body.name = "Body"; add_child(body)
 	root = Node2D.new(); root.name = "Root"; body.add_child(root)
-	poly = Polygon2D.new(); poly.name = "Mesh"; root.add_child(poly)
 	skel = Skeleton2D.new(); skel.name = "Skel"; root.add_child(skel)
-	mat = ShaderMaterial.new(); mat.shader = SKEL_SHADER; poly.material = mat
-	bones.clear(); joint.clear(); dirs.clear(); jig.clear()
+	bones.clear(); parts.clear(); mats.clear(); joint.clear(); dirs.clear(); jig.clear()
 	for b in R.bones:
 		var bn := Bone2D.new(); bn.name = b[0]
 		var j := Vector2(b[2], b[3]); var tip := Vector2(b[4], b[5])
@@ -74,14 +74,28 @@ func _build(texture: Texture2D, s: float) -> void:
 		bn.set_length(max(4.0, (tip - j).length() * sc)); bn.set_bone_angle((tip - j).angle())
 		par.add_child(bn); bones[b[0]] = bn
 		if "j" in String(b[7]): jig[b[0]] = [0.0, 0.0, Vector2.ZERO, Vector2.ZERO]
-	var m: Dictionary = _mesh(texture)
-	var verts := PackedVector2Array()
-	for v in m.uv: verts.append(_p(v))
-	poly.texture = texture
-	poly.polygon = verts; poly.uv = m.uv; poly.polygons = m.polys
-	poly.skeleton = poly.get_path_to(skel)
-	for b in R.bones:
-		if m.w.has(b[0]): poly.add_bone(skel.get_path_to(bones[b[0]]), m.w[b[0]])
+	# cutout parts (tools/cut_parts.py): one Sprite2D per bone, own z order, hidden overlaps painted in
+	# draw order without z_index (z would sort against the whole scene): parts live under one
+	# node in (z, bone order) and follow their bones through RemoteTransform2D
+	var rects: Dictionary = PartRects.R[rig_id]
+	var order := {}
+	for i in R.bones.size(): order[R.bones[i][0]] = i
+	var names: Array = rects.keys()
+	names.sort_custom(func(x, y): return rects[x][4] * 100 + order[x] < rects[y][4] * 100 + order[y])
+	var layer := Node2D.new(); layer.name = "Parts"; root.add_child(layer)
+	for bn in names:
+		var rc: Array = rects[bn]
+		var piv := Node2D.new(); piv.name = "Piv_" + bn; layer.add_child(piv)
+		var rt := RemoteTransform2D.new(); bones[bn].add_child(rt); rt.remote_path = rt.get_path_to(piv)
+		var sp := Sprite2D.new(); sp.name = "P_" + bn; sp.centered = false
+		sp.texture = load("res://assets/parts/%s/%s.png" % [rig_id, bn])
+		sp.scale = Vector2(sc, sc); sp.position = (Vector2(rc[0], rc[1]) - joint[bn]) * sc
+		var m := ShaderMaterial.new(); m.shader = SKEL_SHADER
+		m.set_shader_parameter("region", Vector4(rc[0] / tex_size.x, rc[1] / tex_size.y, rc[2] / tex_size.x, rc[3] / tex_size.y))
+		m.set_shader_parameter("full_tex", texture); m.set_shader_parameter("use_full", true)
+		sp.material = m; mats.append(m)
+		piv.add_child(sp); parts[bn] = sp
+	mat = mats[0]
 	_build_anims()
 
 ## Grid mesh over the opaque part of the texture + per-bone weights (cached per rig).
@@ -158,14 +172,30 @@ func _build_anims() -> void:
 			for k in c.keys[key]:
 				var v = k[1]
 				match parts[1]:
-					"rot": v = float(v)
+					"rot": v = float(v) * (1.0 if parts[0] == "root" or parts[0] == R.get("hand", "") else float(R.get("amp", 1.0)))
 					"pos": v = (node.rest.origin if node is Bone2D else Vector2.ZERO) + Vector2(v[0], v[1]) * sc
 					"scl": v = Vector2(v[0], v[1])
 				keys.append([float(k[0]), v])
 			_track(a, NodePath(String(_path(node)) + ":" + prop), keys)
 		lib.add_animation(cname, a)
+	if lib.has_animation("hit"):
+		var hl: Animation = lib.get_animation("hit").duplicate(true)
+		for ti in hl.get_track_count():
+			for ki in hl.track_get_key_count(ti):
+				var kv = hl.track_get_key_value(ti, ki); var base = reset_value(hl.track_get_path(ti))
+				if kv is float: hl.track_set_key_value(ti, ki, kv * 0.4)
+				elif kv is Vector2 and base is Vector2: hl.track_set_key_value(ti, ki, base + (kv - base) * 0.4)
+		lib.add_animation("hit_l", hl)
 	ap.add_animation_library("", lib)
 	ap.animation_finished.connect(_on_clip_done)
+
+func reset_value(path: NodePath):
+	var n := get_node_or_null(NodePath(String(path).get_slice(":", 0)))
+	var prop := String(path).get_slice(":", 1)
+	if n == null: return null
+	if prop == "scale": return Vector2.ONE
+	if prop == "position": return n.rest.origin if n is Bone2D else Vector2.ZERO
+	return 0.0
 
 func _track(a: Animation, path: NodePath, keys: Array) -> void:
 	var t := a.add_track(Animation.TYPE_VALUE); a.track_set_path(t, path)
@@ -180,7 +210,7 @@ func play_clip(n: String, blend := 0.06) -> void:
 	clip = n
 	ap.play(n, blend)
 	if n == "idle": ap.speed_scale = 1.0
-	var c: Dictionary = R.clips[n]
+	var c: Dictionary = R.clips.get(n, {})
 	if c.has("smear"): _smear_def = c.smear; _smear_t = 0.0
 	if n != "idle" and c.has("smear") == false: _smear_t = -1.0
 
@@ -198,7 +228,9 @@ func attack(kind: String) -> void:
 func kick(knock: float, lean_i: float, squash_i: float, hop_i := 0.0) -> void:
 	super.kick(knock, lean_i, squash_i, hop_i)
 	# big hits (crits, wound breaks) play the authored hit reaction on top of the springs
-	if knock >= 600 and not dead and clip in ["idle", "hit"] and has_clip("hit"): play_clip("hit", 0.03)
+	if dead or not clip in ["idle", "hit", "hit_l"]: return
+	if knock >= 600 and has_clip("hit"): play_clip("hit", 0.03)
+	elif knock > 0 and clip != "hit" and has_clip("hit_l"): play_clip("hit_l", 0.03)
 
 func die() -> void:
 	if has_clip("death"):
@@ -247,7 +279,10 @@ func _show_smear(a0: float, a1: float, rk: float) -> void:
 	tw.tween_callback(func(): smear.visible = false)
 
 func set_wounds(a: float, b: float, c: float) -> void:
-	if mat: super.set_wounds(a, b, c)
+	set_param("wound1", a); set_param("wound2", b); set_param("wound3", c)
+
+func set_param(n: String, v) -> void:
+	for m in mats: m.set_shader_parameter(n, v)
 
 func _process(dt: float) -> void:
 	if body == null: return
@@ -283,7 +318,7 @@ func _process(dt: float) -> void:
 		s[0] = clamp(s[0] + s[1] * dt, -0.6, 0.6)
 		b.rotation += s[0]
 	if flash_v > 0:
-		flash_v = max(0.0, flash_v - dt * 6.0); mat.set_shader_parameter("flash", flash_v)
+		flash_v = max(0.0, flash_v - dt * 6.0); set_param("flash", flash_v)
 	# smear frame
 	if _smear_t >= 0.0:
 		_smear_t += dt
@@ -292,14 +327,16 @@ func _process(dt: float) -> void:
 	if blade:
 		var tipl: Vector2 = blade.get_meta("tip")
 		var tipw: Vector2 = blade.get_global_transform() * tipl
-		var spd: float = tipw.distance_to(_tip_prev) / max(dt, 0.001); _tip_prev = tipw
+		var first := _tip_prev == Vector2.ZERO
+		var spd: float = 0.0 if first else tipw.distance_to(_tip_prev) / max(dt, 0.001)
+		_tip_prev = tipw
 		blade_glow.modulate.a = lerp(blade_glow.modulate.a, clamp(spd / 4000.0, 0.0, 0.8), 0.5)
 		if trail and _trail_on:
 			var gp2 := trail.get_parent() as CanvasItem
 			var world := gp2.get_global_transform().affine_inverse() * tipw
 			for i in range(_trail_pts.size() - 1, 0, -1): _trail_pts[i] = _trail_pts[i - 1]
 			_trail_pts[0] = world
-			if clip == "idle" and spd < 300.0:
+			if first or (clip == "idle" and spd < 300.0):
 				for i in _trail_pts.size(): _trail_pts[i] = world
 			trail.points = _trail_pts
 			trail.modulate.a = clamp(spd / 2500.0, 0.0, 1.0)

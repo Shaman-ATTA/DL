@@ -19,6 +19,10 @@ uniform float rim = 0.6;
 uniform vec4 rim_color : source_color = vec4(1.0, 0.92, 0.75, 1.0);
 uniform vec2 rim_dir = vec2(-0.7, -0.7);
 uniform sampler2D wound_tex : filter_linear;
+// cutout parts: region of this part inside the full sprite (xy offset, zw size, in 0..1) + full sprite for silhouette rim
+uniform vec4 region = vec4(0.0, 0.0, 1.0, 1.0);
+uniform sampler2D full_tex : filter_linear;
+uniform bool use_full = false;
 uniform float wound1 = 0.0;
 uniform float wound2 = 0.0;
 uniform float wound3 = 0.0;
@@ -35,7 +39,8 @@ float noise(vec2 p) {
 void fragment() {
 	vec4 col = texture(TEXTURE, UV);
 	// progressive wounds: R = cracks (75%), G = cuts (50%), B = gashes + drips (25%)
-	vec3 w = texture(wound_tex, UV).rgb;
+	vec2 G = region.xy + UV * region.zw;   // UV in the full sprite
+	vec3 w = texture(wound_tex, G).rgb;
 	float crack = w.r * wound1;
 	float cut = w.g * wound2;
 	float gash = w.b * wound3;
@@ -51,11 +56,12 @@ void fragment() {
 	col.rgb *= 1.0 - darken;
 	// rim light on the side facing the light
 	if (rim > 0.0) {
-		float a2 = texture(TEXTURE, UV + normalize(rim_dir) * TEXTURE_PIXEL_SIZE * 7.0).a;
+		float a2 = use_full ? texture(full_tex, G + normalize(rim_dir) * TEXTURE_PIXEL_SIZE * region.zw * 7.0).a
+			: texture(TEXTURE, UV + normalize(rim_dir) * TEXTURE_PIXEL_SIZE * 7.0).a;
 		col.rgb += rim_color.rgb * col.a * (1.0 - a2) * rim;
 	}
 	if (dissolve > 0.0) {
-		float n = noise(UV * 9.0) * 0.65 + noise(UV * 23.0) * 0.35;
+		float n = noise(G * 9.0) * 0.65 + noise(G * 23.0) * 0.35;
 		float t = dissolve * 1.15;
 		float glow = 1.0 - smoothstep(t, t + 0.08, n);
 		col.rgb = mix(col.rgb, edge_color.rgb * 2.0, glow);
