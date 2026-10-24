@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Dragonshard Legends"
-config/version="1.1.0"
+config/version="1.2.0"
 run/main_scene="res://scenes/intro.tscn"
 config/features=PackedStringArray("4.5", "Mobile")
 boot_splash/bg_color=Color(0.03, 0.02, 0.06, 1)
@@ -22,6 +22,7 @@ config/icon="res://icon.png"
 
 GodotPlayGameServices="*res://addons/GodotPlayGameServices/scripts/autoloads/godot_play_game_services.gd"
 Game="*res://scripts/game.gd"
+Sound="*res://scripts/sound.gd"
 Online="*res://scripts/online.gd"
 
 [display]

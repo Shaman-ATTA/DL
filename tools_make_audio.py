@@ -14,20 +14,6 @@ tt=t(0.25); save("coin",env(0.4*np.sin(2*np.pi*1318*tt)*(tt<0.07)+0.4*np.sin(2*n
 tt=t(0.9); save("boss",env(0.5*np.sign(np.sin(2*np.pi*(70+20*np.sin(9*tt))*tt))*0.5+0.3*rng.uniform(-1,1,len(tt))*np.exp(-tt*4),d=0.35))
 x=np.concatenate([0.35*np.sin(2*np.pi*f*t(0.09))*np.exp(-t(0.09)*20) for f in (523,659,784,1046)]); save("level",x)
 tt=t(0.5); save("skill",env(0.4*np.sin(2*np.pi*(400+1200*tt)*tt)+0.15*rng.uniform(-1,1,len(tt)),d=0.2))
-# music: 16-bar A-minor arpeggio loop with bass + soft pad
-bpm=96; beat=60/bpm; prog=[(57,[69,72,76]),(53,[65,69,72]),(48,[67,72,76]),(55,[67,71,74])]
-f=lambda m:440*2**((m-69)/12); out=[]
-for rep in range(4):
-    for bass,ch in prog:
-        bar=np.zeros(int(R*beat*4)); n=len(bar)
-        tb=np.arange(n)/R; bar+=0.18*np.sin(2*np.pi*f(bass-12)*tb)*(1-0.3*np.cos(2*np.pi*tb/beat))
-        for c in ch: bar+=0.05*np.sin(2*np.pi*f(c)*tb)
-        step=int(R*beat/2)
-        for i in range(8):
-            m=ch[i%3]+(12 if i>=4 and rep%2 else 0); s=np.arange(step)/R
-            bar[i*step:(i+1)*step]+=0.12*np.sin(2*np.pi*f(m)*s)*np.exp(-s*6)
-        out.append(bar)
-save("music",np.concatenate(out)*0.8)
 # --- phase 2 additions ---
 tt=t(2.4)  # intro sting: noise swell into a bright A-major chord
 sw=rng.uniform(-1,1,len(tt))*np.clip(tt/1.0,0,1)**2*(tt<1.05)*0.35
@@ -39,9 +25,4 @@ tt=t(1.6); save("prestige",0.4*np.sin(2*np.pi*(200+900*tt**2)*tt)*np.exp(-tt*1.5
 tt=t(0.4); save("dissolve",0.35*rng.uniform(-1,1,len(tt))*np.exp(-tt*8)*np.sin(2*np.pi*(800-1500*tt)*tt)**2)
 tt=t(0.08); save("click",0.4*np.sin(2*np.pi*900*tt)*np.exp(-tt*60))
 tt=t(0.7); save("whoosh",0.4*rng.uniform(-1,1,len(tt))*np.sin(np.pi*tt/0.7)**2*np.convolve(np.ones(1),[1])[0])
-
-# Ship music as Ogg Vorbis (≈20x smaller than WAV).
-import os, subprocess
-if os.path.exists("assets/audio/music.wav"):
-    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", "assets/audio/music.wav", "-c:a", "libvorbis", "-q:a", "4", "assets/audio/music.ogg"], check=True)
-    os.remove("assets/audio/music.wav")
+# Music: CC0 tracks in assets/music (see LICENSES.md); no longer synthesized.

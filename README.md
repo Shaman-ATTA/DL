@@ -12,3 +12,12 @@ Build: `godot --headless --export-release "Android AAB" build/DragonshardLegends
 - Google Play Billing shop: gem packs, Supporter pack, VIP (x2 gold). Gems are non pay-to-win (cooldowns, time warp, auto-tapper, cosmetic auras).
 - All Play IDs live in `data/services.json` (fill game_id / achievement / leaderboard IDs from Play Console; also set `godot_play_game_services/game_id` in the export preset).
 - Build: Godot 4.5.1 with Android gradle build template (`android/build`).
+
+## v1.2.0 (Phase 3)
+- Modern tween-based hero and monster animation: squash/stretch, hit flash, idle breathing, death dissolve
+- Progressive wounds at 75/50/25% HP, bosses included
+- Expanded settings: audio, haptics, graphics/FPS/battery, notifications, language, account, credits, reset
+- 12 RU/EN story cutscenes between zones
+- Weekly leaderboards: Play Games daily/weekly/all-time spans, in-game screen for stage and raid
+- New CC0 orchestral music (see LICENSES.md)
+- TT2-inspired meta: gear and sets, pets, skill tree, fairies, daily calendar and quests, solo raid, weekend festival (see docs/TT2_GAP.md)

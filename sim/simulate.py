@@ -4,6 +4,8 @@ Player model: several short active sessions per day (tapping ~5 taps/s, using sk
 offline earnings in between, greedy upgrade buying, prestige when progress stalls."""
 import json, math, sys, os
 C = json.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "balance.json")))
+K = json.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "content.json")))
+META = os.environ.get("META", "1") == "1"   # Phase 3 meta-progression (gear, pets, talents, crit)
 TAPS = float(os.environ.get("TAPS", 5))
 SESSIONS = [(8, 15), (12.5, 15), (17, 20), (21, 25)]  # (hour, minutes active)
 
@@ -22,7 +24,34 @@ def comp_mult(l):
 
 class P:
     def __init__(s):
-        s.art = {a["id"]: 0 for a in C["artifacts"]}; s.shards = 0; s.reset()
+        s.art = {a["id"]: 0 for a in C["artifacts"]}; s.shards = 0; s.maxever = 1; s.bosses = 0; s.day = 0
+        s.m = dict(tap=1.0, ally=1.0, gold=1.0, boss=0.0, cc=C["crit_chance"], cm=C["crit_mult"], pet=0.0); s.reset()
+    def update_meta(s):
+        """Expected-value model of the Phase 3 systems for an average player (recomputed each session)."""
+        if not META: return
+        g = K["gear"]; T = K["tree"]
+        # talents: 1 point / 10 best stages, spread round-robin over the damage/gold nodes (max 5 each)
+        pts = s.maxever // T["stages_per_point"]; order = ["t_tap", "t_ally", "t_gold", "t_critd", "t_boss", "t_crit", "t_bossg", "t_pet"]
+        per = {n[0]: n[1] for b in T["branches"].values() for n in b}; lv = {k: 0 for k in order}
+        for i in range(min(pts, len(order) * T["max"])): lv[order[i % len(order)]] += 1
+        tv = lambda k: per[k] * lv.get(k, 0)
+        # gear: drops = 15% of bosses + 1 per 10 bosses (pity), spread over 4 slots; expected best rarity in slot
+        drops = s.bosses * g["boss_drop_chance"] + s.bosses / g["guaranteed_every"]
+        n = drops / 4; w = g["rarity_weights"]; tot = sum(w)
+        cdf = [sum(w[:i + 1]) / tot for i in range(4)]
+        best = sum(g["rarity_base"][i] * ((cdf[i] ** n) - ((cdf[i - 1] ** n) if i else 0)) for i in range(4)) if n > 0 else 0
+        # essence: quests 3x10 + fairies (~6/day x 8) + raid (~3x12) per day, spent evenly on the 4 slots
+        ess = s.day * (30 + 48 + 36); avg_cost = sum(g["enhance_cost"]) / 4
+        elv = min(g["enhance_max"], int(math.sqrt(2 * ess / 4 / avg_cost)))
+        gv = best * (1 + g["enhance_per_level"] * elv) if n > 0 else 0
+        # pets: 1 egg/day (quests) + 1 per 25 best stages + streak; 4 pets, the drake is the active one
+        eggs = s.day + s.maxever / K["pets"]["egg_every_stages"] + s.day / 7 * 2
+        plv = eggs / 4 if s.maxever >= K["pets"]["unlock_stage"] else 0
+        s.m = dict(tap=(1 + gv) * (1 + gv) * (1 + 0.15 * plv) * (1 + tv("t_tap")),
+                   ally=(1 + gv) * (1 + gv) * (1 + tv("t_ally")),
+                   gold=(1 + gv) * (1 + tv("t_gold")), boss=tv("t_boss"),
+                   cc=C["crit_chance"] + tv("t_crit"), cm=C["crit_mult"] * (1 + tv("t_critd")),
+                   pet=((3 + plv) * (1 + tv("t_pet")) / K["pets"]["strike_every"]) if plv > 0 else 0.0)
     def reset(s):
         s.gold = 0.0; s.hero = 1; s.comp = [0] * len(C["companions"])
         s.stage = 1 + s.artv("wings"); s.maxrun = s.stage
@@ -32,10 +61,10 @@ class P:
         return a["per_level"] ** L
     def dps(s):
         t = sum(c["base_dps"] * l * comp_mult(l) for c, l in zip(C["companions"], s.comp))
-        return t * s.artv("heart")
+        return t * s.artv("heart") * s.m["ally"]
     def tap(s):
         h = C["hero"]; l = s.hero
-        return (l * h["dmg_per_level"] * h["milestone_mult"] ** (l // h["milestone_every"]) * s.artv("gauntlet") * s.artv("heart")
+        return (l * h["dmg_per_level"] * h["milestone_mult"] ** (l // h["milestone_every"]) * s.artv("gauntlet") * s.artv("heart") * s.m["tap"]
                 + s.dps() * h["dps_to_tap_share"])
     def skill_mults(s):
         # average uptime multipliers for unlocked skills
@@ -55,11 +84,11 @@ class P:
         d = s.dps() * dpsm
         if active:
             tp = s.tap() * tapm
-            crit = 1 + C["crit_chance"] * (C["crit_mult"] - 1)
-            d += (TAPS + et + burst) * tp * crit
+            crit = 1 + s.m["cc"] * (s.m["cm"] - 1)
+            d += (TAPS + et + burst) * tp * crit * (1 + s.m["pet"])
         return d
     def gold_kill(s, st, boss=False):
-        g = hp(st) * C["gold_per_hp"] * s.artv("crown") * s.skill_mults()[2]
+        g = hp(st) * C["gold_per_hp"] * s.artv("crown") * s.skill_mults()[2] * s.m["gold"]
         return g * (C["boss_gold_mult"] if boss else 1)
     def buy(s):
         h = C["hero"]; bought = True
@@ -108,6 +137,7 @@ def run(days=30, verbose=True):
                 kt = max(C["respawn_delay"], hp(p.stage) / max(d, 1e-9))
                 p.gold += off * C["offline_gold_factor"] * p.artv("moonwell") * p.gold_kill(p.stage) / kt
                 p.buy()
+            p.day = day; p.update_meta()
             t = now; end = now + mins * 60
             while t < end:
                 st = p.stage; D = p.total_dps()
@@ -115,9 +145,9 @@ def run(days=30, verbose=True):
                 n = C["enemies_per_stage"]
                 t += kt * n; p.gold += p.gold_kill(st) * n
                 bt = hp(st) * C["boss_hp_mult"] / D
-                limit = C["boss_time"] + p.artv("hourglass") + p.skill_mults()[5]
+                limit = C["boss_time"] + p.artv("hourglass") + p.skill_mults()[5] + p.m["boss"]
                 if bt <= limit:
-                    t += max(bt, C["respawn_delay"]); p.gold += p.gold_kill(st, True); p.stage += 1
+                    t += max(bt, C["respawn_delay"]); p.gold += p.gold_kill(st, True); p.stage += 1; p.bosses += 1; p.maxever = max(p.maxever, p.stage)
                     if p.stage > p.maxrun: p.maxrun = p.stage; last_new = t
                 else:
                     t += limit

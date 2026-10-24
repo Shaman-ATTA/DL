@@ -1,0 +1,269 @@
+{
+ "portraits": {
+  "hero": "res://assets/sprites/hero.png",
+  "lirael": "res://assets/portraits/c1.png",
+  "borin": "res://assets/portraits/c2.png",
+  "embra": "res://assets/portraits/c3.png",
+  "vex": "res://assets/portraits/c4.png",
+  "aurel": "res://assets/portraits/c5.png",
+  "thornwyn": "res://assets/portraits/c6.png",
+  "kael": "res://assets/portraits/c7.png",
+  "nyssa": "res://assets/portraits/c8.png",
+  "morvath": "res://assets/sprites/boss_lich.png",
+  "wyrm": "res://assets/sprites/boss_wyrm.png",
+  "drake": "res://assets/sprites/pet_drake.png"
+ },
+ "names": {
+  "hero": [
+   "Shardbearer",
+   "Хранитель"
+  ],
+  "lirael": [
+   "Lirael",
+   "Лираэль"
+  ],
+  "borin": [
+   "Borin",
+   "Борин"
+  ],
+  "embra": [
+   "Embra",
+   "Эмбра"
+  ],
+  "vex": [
+   "Vex",
+   "Векс"
+  ],
+  "aurel": [
+   "Sir Aurel",
+   "Сэр Аурел"
+  ],
+  "thornwyn": [
+   "Thornwyn",
+   "Торнвин"
+  ],
+  "kael": [
+   "Kael",
+   "Каэль"
+  ],
+  "nyssa": [
+   "Nyssa",
+   "Нисса"
+  ],
+  "morvath": [
+   "Morvath, the Hollow King",
+   "Морват, Пустой Король"
+  ],
+  "wyrm": [
+   "The Ancient Wyrm",
+   "Древний Змей"
+  ],
+  "drake": [
+   "Ember Drake",
+   "Угольный дракончик"
+  ]
+ },
+ "scenes": {
+  "start": [
+   {
+    "who": "lirael",
+    "en": "The Dragon Shard has shattered! Monsters pour out of every land of Elaria.",
+    "ru": "Драконий Осколок раскололся! Из всех земель Эларии хлынули чудовища."
+   },
+   {
+    "who": "hero",
+    "en": "Then I will gather the pieces. One strike at a time.",
+    "ru": "Тогда я соберу осколки. Удар за ударом."
+   },
+   {
+    "who": "lirael",
+    "en": "Tap to strike. Hire allies, learn spells — and don't let the bosses escape!",
+    "ru": "Касайся, чтобы бить. Нанимай союзников, учи заклинания — и не дай боссам уйти!"
+   }
+  ],
+  "boss1": [
+   {
+    "who": "morvath",
+    "en": "So, a little Shardbearer... The shards are mine. Turn back.",
+    "ru": "Так-так, маленький Хранитель... Осколки мои. Возвращайся домой."
+   },
+   {
+    "who": "hero",
+    "en": "Who are you?",
+    "ru": "Кто ты?"
+   },
+   {
+    "who": "morvath",
+    "en": "Morvath. The Hollow King. Soon you will kneel to what sleeps beneath the world.",
+    "ru": "Морват. Пустой Король. Скоро ты склонишься перед тем, что спит под миром."
+   }
+  ],
+  "stage5": [
+   {
+    "who": "borin",
+    "en": "Ha! You hit like a mountain goat. I like it. Borin's axe is yours.",
+    "ru": "Ха! Бьёшь как горный козёл. Мне нравится. Топор Борина — твой."
+   },
+   {
+    "who": "hero",
+    "en": "Welcome, friend. The road ahead is long.",
+    "ru": "Добро пожаловать, друг. Путь впереди долгий."
+   }
+  ],
+  "boss10": [
+   {
+    "who": "lirael",
+    "en": "Each boss guards a shard fragment. Feel it? It's warm.",
+    "ru": "Каждый босс стережёт частицу Осколка. Чувствуешь? Она тёплая."
+   },
+   {
+    "who": "hero",
+    "en": "It hums... like a heartbeat.",
+    "ru": "Она гудит... будто сердце бьётся."
+   },
+   {
+    "who": "morvath",
+    "en": "Keep them warm for me, Shardbearer.",
+    "ru": "Береги их для меня, Хранитель."
+   }
+  ],
+  "biome_cave": [
+   {
+    "who": "borin",
+    "en": "The Crystal Depths. My grandfather mined here before the golems woke.",
+    "ru": "Хрустальные глубины. Мой дед добывал здесь камень, пока не проснулись големы."
+   },
+   {
+    "who": "embra",
+    "en": "Something is pulling the crystals' light downward. Toward... something huge.",
+    "ru": "Что-то тянет свет кристаллов вниз. К чему-то... огромному."
+   }
+  ],
+  "biome_lava": [
+   {
+    "who": "embra",
+    "en": "Emberfall. My home. The salamanders were never this angry.",
+    "ru": "Пепельные пустоши. Мой дом. Саламандры никогда не были такими злыми."
+   },
+   {
+    "who": "morvath",
+    "en": "The fire remembers its master. So will you.",
+    "ru": "Огонь помнит своего хозяина. Вспомнишь и ты."
+   },
+   {
+    "who": "hero",
+    "en": "Your tricks won't stop us, Morvath.",
+    "ru": "Твои уловки нас не остановят, Морват."
+   }
+  ],
+  "biome_ice": [
+   {
+    "who": "nyssa",
+    "en": "Frostcrown Peaks. The storm here sings of an old name: the Ancient Wyrm.",
+    "ru": "Вершины Ледяной Короны. Буря поёт здесь старое имя: Древний Змей."
+   },
+   {
+    "who": "hero",
+    "en": "So that's what Morvath wants to wake.",
+    "ru": "Так вот кого Морват хочет разбудить."
+   },
+   {
+    "who": "nyssa",
+    "en": "With every shard, the Wyrm stirs. We must be faster.",
+    "ru": "С каждым осколком Змей шевелится. Мы должны успеть раньше."
+   }
+  ],
+  "boss40": [
+   {
+    "who": "morvath",
+    "en": "Enough! You've carried my shards far enough. Now give them to me!",
+    "ru": "Довольно! Ты донёс мои осколки достаточно далеко. Отдай их!"
+   },
+   {
+    "who": "aurel",
+    "en": "Stand behind me, Shardbearer. The Sun Order does not bow to hollow kings.",
+    "ru": "Встань за мной, Хранитель. Орден Солнца не склоняется перед пустыми королями."
+   },
+   {
+    "who": "hero",
+    "en": "Together, then!",
+    "ru": "Тогда вместе!"
+   }
+  ],
+  "loop41": [
+   {
+    "who": "wyrm",
+    "en": "...who... disturbs... my sleep...",
+    "ru": "...кто... тревожит... мой сон..."
+   },
+   {
+    "who": "lirael",
+    "en": "The forest again? No — it's the same forest, but darker. The Wyrm's dream is spreading.",
+    "ru": "Снова лес? Нет — тот же лес, но темнее. Сон Змея расползается."
+   },
+   {
+    "who": "hero",
+    "en": "Then we fight through the dream too.",
+    "ru": "Значит, будем сражаться и во сне."
+   }
+  ],
+  "stage50": [
+   {
+    "who": "kael",
+    "en": "Fifty battles, and you still stand. The dragons of the north will fly with you.",
+    "ru": "Пятьдесят битв, а ты всё стоишь. Драконы севера полетят с тобой."
+   },
+   {
+    "who": "hero",
+    "en": "Then let's end this before the Wyrm wakes.",
+    "ru": "Тогда закончим это, пока Змей не проснулся."
+   }
+  ],
+  "prestige1": [
+   {
+    "who": "thornwyn",
+    "en": "You shattered the shard willingly... and it grew stronger in your hands.",
+    "ru": "Ты сам расколол Осколок... и он стал сильнее в твоих руках."
+   },
+   {
+    "who": "hero",
+    "en": "Every new journey starts stronger than the last.",
+    "ru": "Каждый новый путь начинается сильнее прежнего."
+   },
+   {
+    "who": "morvath",
+    "en": "Clever. But time is on my side.",
+    "ru": "Умно. Но время на моей стороне."
+   }
+  ],
+  "raid1": [
+   {
+    "who": "vex",
+    "en": "Psst. There's a Rift. The Wyrm's shadow leaks through it. Hit it hard enough and it bleeds treasure.",
+    "ru": "Тсс. Там Разлом. Через него сочится тень Змея. Бей сильнее — и посыплются сокровища."
+   },
+   {
+    "who": "hero",
+    "en": "Thirty seconds. Let's see how deep it goes.",
+    "ru": "Тридцать секунд. Посмотрим, как глубоко он идёт."
+   }
+  ],
+  "pet1": [
+   {
+    "who": "drake",
+    "en": "Rrrr! *sneezes a tiny flame*",
+    "ru": "Ррр! *чихает крошечным огоньком*"
+   },
+   {
+    "who": "hero",
+    "en": "Ha! You'll fight with me, little one?",
+    "ru": "Ха! Будешь сражаться со мной, малыш?"
+   },
+   {
+    "who": "lirael",
+    "en": "Pets strike on their own every few taps. Feed it eggs to make it stronger!",
+    "ru": "Питомцы бьют сами каждые несколько касаний. Яйца делают их сильнее!"
+   }
+  ]
+ }
+}

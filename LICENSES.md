@@ -1,7 +1,16 @@
 # Licenses / Credits
 - Code: original, written for Dragonshard Legends.
 - Art: original images generated for this project with an AI image generator, processed with tools_process_art.py. coin/shard and UI effects are procedural. No third-party assets.
-- Audio: synthesized by tools_make_audio.py, public domain (CC0).
+- Sound effects: synthesized by tools_make_audio.py, public domain (CC0).
+- Music (all CC0 1.0, from OpenGameArt.org; credited in-game under Settings → Credits too):
+  - assets/music/forest.ogg — "Fairy Adventure" by MintoDog — https://opengameart.org/content/fairy-adventure
+  - assets/music/cave.ogg — "Great Labyrinth (Orchestral dungeon music)" by MintoDog — https://opengameart.org/content/great-labyrinthorchestral-dungeon-music
+  - assets/music/lava.ogg — "Heavy Dungeon" by MintoDog — https://opengameart.org/content/heavy-dungeon
+  - assets/music/ice.ogg — "Fairy Battles" by MintoDog — https://opengameart.org/content/fairy-battles
+  - assets/music/boss.ogg — "Fairy Boss Battles" by MintoDog — https://opengameart.org/content/fairy-boss-battles
+  - assets/music/raid.ogg — "Hope (Orchestral battle music)" by MintoDog — https://opengameart.org/content/hopeorchestral-battle-music
+  - assets/music/menu.ogg — "Fantasy Orchestral Theme" by Joth — https://opengameart.org/content/fantasy-orchestral-theme
+  - assets/music/story.ogg — "A New Town (RPG Theme)" by cynicmusic — https://opengameart.org/content/a-new-town-rpg-theme
 - Fonts: Philosopher (Jovanny Lemonad) and Ruslan Display (Vladimir Rasikhin) — SIL Open Font License 1.1, see assets/fonts/OFL-*.txt.
 - Engine: Godot Engine 4.5.1 (MIT).
 - Plugins: GodotPlayGameServices 3.4.0 (MIT, Iakobs) and GodotGooglePlayBilling 3.3.0 (MIT, Godot Engine contributors); they bundle Google Play Services / Play Billing libraries under Google's terms.

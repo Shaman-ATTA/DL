@@ -7,12 +7,15 @@ signal status_changed
 signal toast(text: String)
 signal cloud_conflict(cloud: Dictionary)   # cloud save has more progress than local
 signal purchase_granted(product_id: String)
+signal scores_loaded(board: String, span: int, rows: Array)   # rows: [{rank, name, score, me}]
 
 var gpgs_available := false
 var signed_in := false
 var billing_ready := false
 var prices: Dictionary = {}       # product_id -> formatted price
-var _sign: Node; var _snap: Node; var _ach: Node; var _lb: Node
+var _sign: Node; var _snap: Node; var _ach: Node; var _lb: Node; var _players: Node
+var player_name := ""
+var _want := {}                   # leaderboard id -> [board, span]
 var _billing: Node
 var _cfg: Dictionary
 var _products: Dictionary = {}    # id -> config dict
@@ -37,6 +40,9 @@ func _init_pgs() -> void:
 	_snap = PlayGamesSnapshotsClient.new(); add_child(_snap)
 	_ach = PlayGamesAchievementsClient.new(); add_child(_ach)
 	_lb = PlayGamesLeaderboardsClient.new(); add_child(_lb)
+	_players = PlayGamesPlayersClient.new(); add_child(_players)
+	_players.current_player_loaded.connect(func(pl): if pl: player_name = pl.display_name; status_changed.emit())
+	_lb.top_scores_loaded.connect(_on_top_scores)
 	_sign.user_authenticated.connect(_on_auth)
 	_snap.game_loaded.connect(_on_cloud_loaded)
 	_snap.game_saved.connect(func(ok: bool, _n: String, _d: String):
@@ -51,7 +57,8 @@ func _on_auth(ok: bool) -> void:
 	if ok:
 		load_cloud(false)
 		for k in Game.ach: _push_achievement(k)
-		submit_stage()
+		submit_stage(); submit_raid()
+		_players.load_current_player(false)
 
 func sign_in() -> void:
 	if gpgs_available: _sign.sign_in()
@@ -94,6 +101,34 @@ func _push_achievement(key: String) -> void:
 func submit_stage() -> void:
 	var id: String = _cfg.play_games.leaderboard_max_stage
 	if signed_in and id != "": _lb.submit_score(id, Game.max_stage)
+
+func submit_raid() -> void:
+	var id: String = _cfg.play_games.get("leaderboard_raid", "")
+	if signed_in and id != "" and Game.raid_best > 0: _lb.submit_score(id, Game.raid_best)
+
+func board_id(board: String) -> String:
+	return _cfg.play_games.get("leaderboard_raid" if board == "raid" else "leaderboard_max_stage", "")
+
+## True when the in-game leaderboard can query Play Games (signed in + IDs configured).
+func leaderboards_live(board: String) -> bool: return signed_in and board_id(board) != ""
+
+## span: 0 daily, 1 weekly, 2 all-time (PlayGamesLeaderboardVariant.TimeSpan). Emits scores_loaded.
+func load_scores(board: String, span: int) -> void:
+	if not leaderboards_live(board): return
+	var id := board_id(board); _want[id] = [board, span]
+	_lb.load_top_scores(id, span, 0, 25, true)
+
+func _on_top_scores(id: String, s) -> void:
+	if not _want.has(id) or s == null: return
+	var rows := []
+	for sc in s.scores:
+		rows.append({"rank": sc.rank, "name": sc.score_holder_display_name, "score": sc.raw_score,
+			"me": player_name != "" and sc.score_holder_display_name == player_name})
+	scores_loaded.emit(_want[id][0], _want[id][1], rows)
+
+func show_native_board(board: String, span: int) -> void:
+	if leaderboards_live(board): _lb.show_leaderboard_for_time_span(board_id(board), span)
+	else: sign_in()
 
 func show_achievements() -> void:
 	if signed_in: _ach.show_achievements()

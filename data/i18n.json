@@ -1,0 +1,614 @@
+{
+ "side_quests": {
+  "en": "Quests",
+  "ru": "Задания"
+ },
+ "side_raid": {
+  "en": "Raid",
+  "ru": "Рейд"
+ },
+ "side_ranking": {
+  "en": "Ranking",
+  "ru": "Рейтинг"
+ },
+ "side_calendar": {
+  "en": "Daily",
+  "ru": "Награды"
+ },
+ "offline_full": {
+  "en": "Your treasure chest was full! Come back more often to earn more.",
+  "ru": "Сундук был полон! Заходите чаще, чтобы получать больше."
+ },
+ "raid_title": {
+  "en": "Wyrm Raid",
+  "ru": "Рейд на Змея"
+ },
+ "tier": {
+  "en": "Tier",
+  "ru": "Ярус"
+ },
+ "raid_result": {
+  "en": "Raid over! Score %s\n%s",
+  "ru": "Рейд окончен! Счёт %s\n%s"
+ },
+ "new_best": {
+  "en": "New record!",
+  "ru": "Новый рекорд!"
+ },
+ "essence": {
+  "en": "Essence",
+  "ru": "Эссенция"
+ },
+ "egg": {
+  "en": "Eggs",
+  "ru": "Яйца"
+ },
+ "warp_h": {
+  "en": "+%dh of gold",
+  "ru": "+%d ч золота"
+ },
+ "festival": {
+  "en": "Gold festival",
+  "ru": "Праздник золота"
+ },
+ "inv_full": {
+  "en": "Inventory full — salvage gear!",
+  "ru": "Инвентарь полон — разберите снаряжение!"
+ },
+ "gear_drop": {
+  "en": "Found: %s",
+  "ru": "Найдено: %s"
+ },
+ "fairy_got": {
+  "en": "Fairy gift: %s",
+  "ru": "Дар феи: %s"
+ },
+ "skill_ready": {
+  "en": "%s is ready!",
+  "ru": "%s готово!"
+ },
+ "skip": {
+  "en": "Skip ▶▶",
+  "ru": "Пропустить ▶▶"
+ },
+ "q_taps": {
+  "en": "Make taps",
+  "ru": "Сделать касания"
+ },
+ "q_kills": {
+  "en": "Slay monsters",
+  "ru": "Убить монстров"
+ },
+ "q_bosses": {
+  "en": "Defeat bosses",
+  "ru": "Победить боссов"
+ },
+ "q_skills": {
+  "en": "Use skills",
+  "ru": "Применить умения"
+ },
+ "q_upgrades": {
+  "en": "Buy upgrades",
+  "ru": "Купить улучшения"
+ },
+ "q_fairies": {
+  "en": "Catch fairies",
+  "ru": "Поймать фей"
+ },
+ "q_raid": {
+  "en": "Fight a raid",
+  "ru": "Сразиться в рейде"
+ },
+ "quest_done": {
+  "en": "Quest done: %s",
+  "ru": "Задание выполнено: %s"
+ },
+ "quest_all": {
+  "en": "All quests done! Bonus egg",
+  "ru": "Все задания выполнены! Бонусное яйцо"
+ },
+ "ach_first_pet": {
+  "en": "First companion beast",
+  "ru": "Первый питомец"
+ },
+ "ach_legendary": {
+  "en": "Legendary find",
+  "ru": "Легендарная находка"
+ },
+ "ach_streak_7": {
+  "en": "7-day streak",
+  "ru": "7 дней подряд"
+ },
+ "ach_quests_all": {
+  "en": "Daily champion",
+  "ru": "Чемпион дня"
+ },
+ "ach_raid_10": {
+  "en": "Raid tier 10",
+  "ru": "Ярус рейда 10"
+ },
+ "sub_hero": {
+  "en": "Hero",
+  "ru": "Герой"
+ },
+ "sub_gear": {
+  "en": "Gear",
+  "ru": "Снаряжение"
+ },
+ "sub_pets": {
+  "en": "Pets",
+  "ru": "Питомцы"
+ },
+ "sub_tree": {
+  "en": "Talents",
+  "ru": "Таланты"
+ },
+ "hero_stats": {
+  "en": "Crit chance %s%% · crit ×%s\nTap bonus +%s%% · allies +%s%%\nGold +%s%% · cooldowns −%s%%",
+  "ru": "Шанс крита %s%% · крит ×%s\nКасание +%s%% · союзники +%s%%\nЗолото +%s%% · перезарядка −%s%%"
+ },
+ "slot_weapon": {
+  "en": "Blade",
+  "ru": "Клинок"
+ },
+ "slot_helm": {
+  "en": "Helm",
+  "ru": "Шлем"
+ },
+ "slot_armor": {
+  "en": "Armor",
+  "ru": "Доспех"
+ },
+ "slot_charm": {
+  "en": "Charm",
+  "ru": "Амулет"
+ },
+ "set_ember": {
+  "en": "Ember",
+  "ru": "Пламени"
+ },
+ "set_frost": {
+  "en": "Frost",
+  "ru": "Инея"
+ },
+ "set_verdant": {
+  "en": "Verdant",
+  "ru": "Чащи"
+ },
+ "set_storm": {
+  "en": "Storm",
+  "ru": "Бури"
+ },
+ "r0": {
+  "en": "Common",
+  "ru": "Обычный"
+ },
+ "r1": {
+  "en": "Rare",
+  "ru": "Редкий"
+ },
+ "r2": {
+  "en": "Epic",
+  "ru": "Эпический"
+ },
+ "r3": {
+  "en": "Legendary",
+  "ru": "Легендарный"
+ },
+ "gstat_tap": {
+  "en": "+%s%% tap damage",
+  "ru": "+%s%% урона касанием"
+ },
+ "gstat_gold": {
+  "en": "+%s%% gold",
+  "ru": "+%s%% золота"
+ },
+ "gstat_ally": {
+  "en": "+%s%% ally DPS",
+  "ru": "+%s%% урона союзников"
+ },
+ "gstat_all": {
+  "en": "+%s%% all damage",
+  "ru": "+%s%% всего урона"
+ },
+ "gstat_crit": {
+  "en": "+%s%% crit chance",
+  "ru": "+%s%% шанса крита"
+ },
+ "craft": {
+  "en": "Forge (%d)",
+  "ru": "Выковать (%d)"
+ },
+ "equip": {
+  "en": "Equip",
+  "ru": "Надеть"
+ },
+ "equipped": {
+  "en": "Equipped",
+  "ru": "Надето"
+ },
+ "sets_info": {
+  "en": "Wear 2/4 pieces of one set for a bonus: Ember — tap, Frost — boss time, Verdant — gold, Storm — pet.",
+  "ru": "2/4 предмета одного комплекта дают бонус: Пламя — касание, Иней — время босса, Чаща — золото, Буря — питомец."
+ },
+ "gear_empty": {
+  "en": "Bosses drop gear. Defeat one, or forge with essence!",
+  "ru": "Боссы роняют снаряжение. Победите босса или выкуйте за эссенцию!"
+ },
+ "pets_locked": {
+  "en": "Pets unlock at stage %d.",
+  "ru": "Питомцы откроются на этапе %d."
+ },
+ "hatch": {
+  "en": "Hatch egg",
+  "ru": "Высидеть яйцо"
+ },
+ "hatched": {
+  "en": "Hatched: %s!",
+  "ru": "Вылупился: %s!"
+ },
+ "buy_egg": {
+  "en": "Egg — %d 💎",
+  "ru": "Яйцо — %d 💎"
+ },
+ "pets_info": {
+  "en": "The active pet strikes every %d taps. Duplicates level pets up.",
+  "ru": "Активный питомец бьёт каждые %d касаний. Повторы повышают уровень."
+ },
+ "pet_drake": {
+  "en": "Ember Drake",
+  "ru": "Огненный дракончик"
+ },
+ "pet_owl": {
+  "en": "Gold Owl",
+  "ru": "Золотая сова"
+ },
+ "pet_sprite": {
+  "en": "Forest Sprite",
+  "ru": "Лесной дух"
+ },
+ "pet_ferret": {
+  "en": "Shadow Ferret",
+  "ru": "Теневой хорёк"
+ },
+ "active": {
+  "en": "Active",
+  "ru": "Активен"
+ },
+ "set_active": {
+  "en": "Take",
+  "ru": "Взять"
+ },
+ "tree_points": {
+  "en": "Talent points: %d free of %d (1 per %d best stages)",
+  "ru": "Очки талантов: %d свободно из %d (1 за каждые %d этапов)"
+ },
+ "respec": {
+  "en": "Reset (%d 💎)",
+  "ru": "Сброс (%d 💎)"
+ },
+ "br_blade": {
+  "en": "Blade",
+  "ru": "Клинок"
+ },
+ "br_command": {
+  "en": "Command",
+  "ru": "Командование"
+ },
+ "br_fortune": {
+  "en": "Fortune",
+  "ru": "Удача"
+ },
+ "tn_t_tap": {
+  "en": "Sharp edge",
+  "ru": "Острая кромка"
+ },
+ "td_t_tap": {
+  "en": "+%s%% tap damage",
+  "ru": "+%s%% урона касанием"
+ },
+ "tn_t_crit": {
+  "en": "Precision",
+  "ru": "Точность"
+ },
+ "td_t_crit": {
+  "en": "+%s%% crit chance",
+  "ru": "+%s%% шанса крита"
+ },
+ "tn_t_critd": {
+  "en": "Executioner",
+  "ru": "Палач"
+ },
+ "td_t_critd": {
+  "en": "+%s%% crit damage",
+  "ru": "+%s%% крит. урона"
+ },
+ "tn_t_pet": {
+  "en": "Beast bond",
+  "ru": "Связь со зверем"
+ },
+ "td_t_pet": {
+  "en": "+%s%% pet damage",
+  "ru": "+%s%% урона питомца"
+ },
+ "tn_t_ally": {
+  "en": "Warcry",
+  "ru": "Боевой клич"
+ },
+ "td_t_ally": {
+  "en": "+%s%% ally DPS",
+  "ru": "+%s%% урона союзников"
+ },
+ "tn_t_cd": {
+  "en": "Focus",
+  "ru": "Сосредоточение"
+ },
+ "td_t_cd": {
+  "en": "−%s%% skill cooldowns",
+  "ru": "−%s%% перезарядки умений"
+ },
+ "tn_t_boss": {
+  "en": "Patience",
+  "ru": "Терпение"
+ },
+ "td_t_boss": {
+  "en": "+%s s boss timer",
+  "ru": "+%s с на босса"
+ },
+ "tn_t_off": {
+  "en": "Night watch",
+  "ru": "Ночной дозор"
+ },
+ "td_t_off": {
+  "en": "+%s%% offline gold",
+  "ru": "+%s%% золота офлайн"
+ },
+ "tn_t_gold": {
+  "en": "Greed",
+  "ru": "Алчность"
+ },
+ "td_t_gold": {
+  "en": "+%s%% gold",
+  "ru": "+%s%% золота"
+ },
+ "tn_t_bossg": {
+  "en": "Bounty",
+  "ru": "Награда за голову"
+ },
+ "td_t_bossg": {
+  "en": "+%s%% boss gold",
+  "ru": "+%s%% золота с боссов"
+ },
+ "tn_t_fairy": {
+  "en": "Fairy friend",
+  "ru": "Друг фей"
+ },
+ "td_t_fairy": {
+  "en": "+%s%% fairy gifts",
+  "ru": "+%s%% даров фей"
+ },
+ "tn_t_gear": {
+  "en": "Treasure hunter",
+  "ru": "Охотник за сокровищами"
+ },
+ "td_t_gear": {
+  "en": "+%s%% gear drop chance",
+  "ru": "+%s%% шанса снаряжения"
+ },
+ "g_egg": {
+  "en": "Pet egg",
+  "ru": "Яйцо питомца"
+ },
+ "vol_master": {
+  "en": "Master",
+  "ru": "Общая"
+ },
+ "vol_music": {
+  "en": "Music",
+  "ru": "Музыка"
+ },
+ "vol_sfx": {
+  "en": "Effects",
+  "ru": "Эффекты"
+ },
+ "haptics": {
+  "en": "Vibration",
+  "ru": "Вибрация"
+ },
+ "set_audio": {
+  "en": "Sound",
+  "ru": "Звук"
+ },
+ "set_graphics": {
+  "en": "Graphics",
+  "ru": "Графика"
+ },
+ "set_notif": {
+  "en": "Notifications",
+  "ru": "Уведомления"
+ },
+ "set_account": {
+  "en": "Account",
+  "ru": "Аккаунт"
+ },
+ "set_about": {
+  "en": "About",
+  "ru": "О игре"
+ },
+ "quality": {
+  "en": "Quality",
+  "ru": "Качество"
+ },
+ "q_low": {
+  "en": "Low",
+  "ru": "Низкое"
+ },
+ "q_med": {
+  "en": "Medium",
+  "ru": "Среднее"
+ },
+ "q_high": {
+  "en": "High",
+  "ru": "Высокое"
+ },
+ "fps": {
+  "en": "FPS",
+  "ru": "Кадры/с"
+ },
+ "battery": {
+  "en": "Battery saver",
+  "ru": "Экономия батареи"
+ },
+ "dmg_numbers": {
+  "en": "Damage numbers",
+  "ru": "Цифры урона"
+ },
+ "shake": {
+  "en": "Screen shake",
+  "ru": "Тряска экрана"
+ },
+ "notif_offline": {
+  "en": "Full chest reminder",
+  "ru": "Напоминание о полном сундуке"
+ },
+ "notif_skills": {
+  "en": "Skill ready alerts",
+  "ru": "Сигнал готовности умений"
+ },
+ "notif_note": {
+  "en": "Notifications are shown inside the game.",
+  "ru": "Уведомления показываются внутри игры."
+ },
+ "signout_note": {
+  "en": "To sign out, use the Play Games app.",
+  "ru": "Выйти из аккаунта можно в приложении Play Игры."
+ },
+ "credits": {
+  "en": "Credits",
+  "ru": "Авторы"
+ },
+ "privacy_btn": {
+  "en": "Privacy",
+  "ru": "Конфиденциальность"
+ },
+ "reset": {
+  "en": "Reset progress",
+  "ru": "Сбросить прогресс"
+ },
+ "reset_warn": {
+  "en": "All progress (stages, gear, pets, shards) will be deleted from this device. Purchases are kept and can be restored. This cannot be undone.",
+  "ru": "Весь прогресс (этапы, снаряжение, питомцы, осколки) будет удалён с устройства. Покупки сохранятся и могут быть восстановлены. Это нельзя отменить."
+ },
+ "reset_yes": {
+  "en": "Delete progress",
+  "ru": "Удалить прогресс"
+ },
+ "reset_again": {
+  "en": "Tap again to confirm",
+  "ru": "Нажмите ещё раз для подтверждения"
+ },
+ "quests_info": {
+  "en": "Daily quests: +%d 💎 and +%d essence each.",
+  "ru": "Ежедневные задания: +%d 💎 и +%d эссенции за каждое."
+ },
+ "quest_bonus": {
+  "en": "Finish all for +%d egg",
+  "ru": "Выполните все: +%d яйцо"
+ },
+ "quest_reset": {
+  "en": "New quests every day at midnight.",
+  "ru": "Новые задания каждый день в полночь."
+ },
+ "raid_info": {
+  "en": "Deal as much damage as you can to the Ancient Wyrm in %d seconds. Each tier is harder and pays more.",
+  "ru": "Нанесите Древнему Змею как можно больше урона за %d секунд. Каждый ярус сложнее и щедрее."
+ },
+ "raid_tickets": {
+  "en": "Tickets today",
+  "ru": "Билеты на сегодня"
+ },
+ "raid_best": {
+  "en": "Best",
+  "ru": "Лучший"
+ },
+ "raid_start": {
+  "en": "Start raid",
+  "ru": "Начать рейд"
+ },
+ "raid_after_boss": {
+  "en": "Finish the current boss first.",
+  "ru": "Сначала победите текущего босса."
+ },
+ "lb_stage": {
+  "en": "Max stage",
+  "ru": "Макс. этап"
+ },
+ "lb_raid": {
+  "en": "Raid",
+  "ru": "Рейд"
+ },
+ "lb_day": {
+  "en": "Today",
+  "ru": "Сегодня"
+ },
+ "lb_week": {
+  "en": "Week",
+  "ru": "Неделя"
+ },
+ "lb_all": {
+  "en": "All time",
+  "ru": "Всё время"
+ },
+ "lb_mine": {
+  "en": "Your best: %s",
+  "ru": "Ваш рекорд: %s"
+ },
+ "lb_weekly_note": {
+  "en": "Weekly board resets every week.",
+  "ru": "Недельный рейтинг обнуляется каждую неделю."
+ },
+ "lb_loading": {
+  "en": "Loading…",
+  "ru": "Загрузка…"
+ },
+ "lb_native": {
+  "en": "Open in Play Games",
+  "ru": "Открыть в Play Играх"
+ },
+ "lb_empty": {
+  "en": "No scores yet — be the first!",
+  "ru": "Пока нет результатов — будьте первым!"
+ },
+ "lb_offline": {
+  "en": "Ranking is offline",
+  "ru": "Рейтинг недоступен"
+ },
+ "lb_signin": {
+  "en": "Sign in to Google Play Games to compete.",
+  "ru": "Войдите в Google Play Игры, чтобы соревноваться."
+ },
+ "lb_noid": {
+  "en": "Leaderboards are not configured in this build.",
+  "ru": "В этой сборке рейтинги не настроены."
+ },
+ "cal_info": {
+  "en": "Log in every day. Missing a day restarts the week.",
+  "ru": "Заходите каждый день. Пропуск начинает неделю заново."
+ },
+ "cal_day": {
+  "en": "Day %d",
+  "ru": "День %d"
+ },
+ "cal_claim": {
+  "en": "Claim",
+  "ru": "Забрать"
+ },
+ "cal_claimed": {
+  "en": "Come back tomorrow",
+  "ru": "Приходите завтра"
+ },
+ "credits_text": {
+  "en": "[b]Dragonshard Legends[/b]\nDesign, code, art: Dragonshard team\nEngine: Godot Engine (MIT)\n\n[b]Music (CC0, OpenGameArt.org)[/b]\nMintoDog — Fairy Adventure, Great Labyrinth, Heavy Dungeon, Fairy Battles, Fairy Boss Battles, Hope\nJoth — Fantasy Orchestral Theme\ncynicmusic — A New Town\n\nSound effects: generated in-house\nFull licenses: LICENSES.md",
+  "ru": "[b]Легенды Драконьего Осколка[/b]\nДизайн, код, графика: команда Dragonshard\nДвижок: Godot Engine (MIT)\n\n[b]Музыка (CC0, OpenGameArt.org)[/b]\nMintoDog — Fairy Adventure, Great Labyrinth, Heavy Dungeon, Fairy Battles, Fairy Boss Battles, Hope\nJoth — Fantasy Orchestral Theme\ncynicmusic — A New Town\n\nЗвуковые эффекты: собственные\nПолные лицензии: LICENSES.md"
+ }
+}

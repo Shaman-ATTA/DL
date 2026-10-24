@@ -25,6 +25,30 @@ var last_daily := ""
 var auto_tap_left := 0.0
 var processed_tokens: Dictionary = {}  # purchase tokens already granted (idempotency)
 var S: Dictionary                 # data/services.json
+var K: Dictionary                 # data/content.json (gear, pets, tree, quests, raid ...)
+# ---- Phase 3 state ----
+var settings := {"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 1.0, "haptics": true, "quality": 2, "fps": 60,
+	"battery": false, "dmg_numbers": true, "shake": true, "notif_offline": true, "notif_skills": true}
+var essence := 0
+var eggs := 0
+var gear: Array = []              # [{id, slot, r, set, lv}]
+var equipped := {}                # slot -> gear id
+var gear_uid := 1
+var pets := {}                    # pet id -> level (0 = not owned)
+var active_pet := ""
+var tree := {}                    # node id -> level
+var streak := 0                   # days claimed in the current 7-day cycle
+var streak_day := ""
+var quest_day := ""
+var quests: Array = []            # [{k, goal, p, done}]
+var quest_bonus := false
+var raid_day := ""
+var raid_tickets := 3
+var raid_best := 0                # tier*100 + percent
+var story_seen := {}
+var offline_full := false
+var stats := {"kills": 0, "bosses": 0, "fairies": 0, "raids": 0}
+signal quest_done(text: String)
 signal achievement(key: String)
 signal gems_changed
 signal click
@@ -33,6 +57,12 @@ const SAVE := "user://save.json"
 func _ready() -> void:
 	C = JSON.parse_string(FileAccess.get_file_as_string("res://data/balance.json"))
 	S = JSON.parse_string(FileAccess.get_file_as_string("res://data/services.json"))
+	K = JSON.parse_string(FileAccess.get_file_as_string("res://data/content.json"))
+	var ex = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n.json"))
+	if typeof(ex) == TYPE_DICTIONARY: _i18n_extra = ex
+	for p in K.pets.list: pets[p.id] = 0
+	for b in K.tree.branches.values():
+		for n in b: tree[n[0]] = 0
 	comp.resize(C.companions.size()); comp.fill(0)
 	for a in C.artifacts: art[a.id] = 0
 	if OS.get_locale_language() != "ru": lang = "en"
@@ -66,7 +96,7 @@ func artv(id: String) -> float:
 
 func comp_dps(i: int, l: int = -1) -> float:
 	if l < 0: l = comp[i]
-	return C.companions[i].base_dps * l * comp_mult(l) * artv("heart")
+	return C.companions[i].base_dps * l * comp_mult(l) * artv("heart") * ally_mult()
 
 func dps() -> float:
 	var t := 0.0
@@ -76,7 +106,7 @@ func dps() -> float:
 func tap_dmg(l: int = -1) -> float:
 	if l < 0: l = hero_lv
 	var h: Dictionary = C.hero
-	return l * h.dmg_per_level * pow(h.milestone_mult, l / int(h.milestone_every)) * artv("gauntlet") * artv("heart") + dps() * h.dps_to_tap_share
+	return l * h.dmg_per_level * pow(h.milestone_mult, l / int(h.milestone_every)) * artv("gauntlet") * artv("heart") * tap_mult() + dps() * h.dps_to_tap_share
 
 func hero_cost(l: int = -1) -> float:
 	if l < 0: l = hero_lv
@@ -86,10 +116,10 @@ func comp_cost(i: int) -> float:
 	return ceil(C.companions[i].base_cost * pow(C.companion_cost_growth, comp[i]))
 
 func gold_kill(s: int, boss := false) -> float:
-	var g: float = hp(s) * C.gold_per_hp * artv("crown") * (S.gems.vip_gold_mult if owned.has("vip") else 1.0)
-	return g * (C.boss_gold_mult if boss else 1.0)
+	var g: float = hp(s) * C.gold_per_hp * artv("crown") * (S.gems.vip_gold_mult if owned.has("vip") else 1.0) * gold_mult()
+	return g * (C.boss_gold_mult * (1.0 + tv("t_bossg")) if boss else 1.0)
 
-func boss_time() -> float: return C.boss_time + artv("hourglass")
+func boss_time() -> float: return C.boss_time + artv("hourglass") + tv("t_boss") + set_bonus("frost")
 
 func shards_for(s: int) -> int:
 	var p: Dictionary = C.prestige
@@ -103,12 +133,12 @@ func art_cost(id: String) -> int:
 func buy_hero() -> bool:
 	var c := hero_cost()
 	if gold < c: return false
-	gold -= c; hero_lv += 1; changed.emit(); return true
+	gold -= c; hero_lv += 1; qp("upgrades"); changed.emit(); return true
 
 func buy_comp(i: int) -> bool:
 	var c := comp_cost(i)
 	if gold < c: return false
-	gold -= c; comp[i] += 1
+	gold -= c; comp[i] += 1; qp("upgrades")
 	if not comp.has(0): unlock("all_allies")
 	changed.emit(); return true
 
@@ -131,7 +161,10 @@ func _dev_lang() -> void:
 		if a.begins_with("--shot=") or a.begins_with("--intro-shot="): lang = a.split(",")[-1]
 
 func to_dict() -> Dictionary:
-	return {"v": 2, "gold": gold, "shards": shards, "hero": hero_lv, "comp": comp, "art": art,
+	return {"v": 3, "settings": settings, "essence": essence, "eggs": eggs, "gear": gear, "equipped": equipped,
+		"gear_uid": gear_uid, "pets": pets, "active_pet": active_pet, "tree": tree, "streak": streak, "streak_day": streak_day,
+		"quest_day": quest_day, "quests": quests, "quest_bonus": quest_bonus, "raid_day": raid_day, "raid_tickets": raid_tickets,
+		"raid_best": raid_best, "story": story_seen, "stats": stats, "gold": gold, "shards": shards, "hero": hero_lv, "comp": comp, "art": art,
 		"stage": stage, "max": max_stage, "run_max": run_max, "taps": total_taps, "snd": sound_on,
 		"mus": music_on, "lang": lang, "t": Time.get_unix_time_from_system(), "gems": gems, "owned": owned,
 		"aura": aura, "ach": ach, "prestiges": prestiges, "daily": last_daily, "tokens": processed_tokens}
@@ -147,6 +180,27 @@ func from_dict(d: Dictionary) -> void:
 	total_taps = int(d.get("taps", 0)); sound_on = d.get("snd", true); music_on = d.get("mus", true); lang = d.get("lang", lang)
 	gems = int(d.get("gems", 0)); owned = d.get("owned", {}); aura = d.get("aura", ""); ach = d.get("ach", {})
 	prestiges = int(d.get("prestiges", 0)); last_daily = d.get("daily", ""); processed_tokens = d.get("tokens", {})
+	# v3 (Phase 3); older saves migrate with defaults
+	var st: Dictionary = d.get("settings", {})
+	for k in st:
+		if settings.has(k): settings[k] = st[k]
+	if not st.has("vol_sfx") and not sound_on: settings.vol_sfx = 0.0
+	if not st.has("vol_music") and not music_on: settings.vol_music = 0.0
+	settings.quality = int(settings.quality); settings.fps = int(settings.fps)
+	essence = int(d.get("essence", 0)); eggs = int(d.get("eggs", 0))
+	gear = d.get("gear", []); equipped = d.get("equipped", {}); gear_uid = int(d.get("gear_uid", 1))
+	for g in gear: g.id = int(g.id); g.r = int(g.r); g.lv = int(g.lv)
+	for k in equipped: equipped[k] = int(equipped[k])
+	var pd: Dictionary = d.get("pets", {})
+	for k in pets: pets[k] = int(pd.get(k, 0))
+	active_pet = d.get("active_pet", "")
+	var td: Dictionary = d.get("tree", {})
+	for k in tree: tree[k] = int(td.get(k, 0))
+	streak = int(d.get("streak", 0)); streak_day = d.get("streak_day", "")
+	quest_day = d.get("quest_day", ""); quests = d.get("quests", []); quest_bonus = d.get("quest_bonus", false)
+	raid_day = d.get("raid_day", ""); raid_tickets = int(d.get("raid_tickets", 3)); raid_best = int(d.get("raid_best", 0))
+	story_seen = d.get("story", {}); var sd: Dictionary = d.get("stats", {})
+	for k in stats: stats[k] = int(sd.get(k, 0))
 
 ## Progress score used to resolve local vs cloud save conflicts.
 func progress_score(d: Dictionary) -> float:
@@ -162,17 +216,19 @@ func load_game() -> void:
 	if typeof(d) != TYPE_DICTIONARY: return
 	from_dict(d)
 	var dt: float = clamp(Time.get_unix_time_from_system() - float(d.get("t", 0)), 0, C.offline_cap_hours * 3600.0)
+	offline_full = dt >= C.offline_cap_hours * 3600.0 - 1
 	if dt > 60: offline_gold = offline_income(dt); gold += offline_gold
 
 func offline_income(seconds: float) -> float:
 	var d_ := dps()
 	if d_ <= 0: return 0.0
 	var kt: float = max(hp(stage) / d_, C.respawn_delay)
-	return seconds / kt * gold_kill(stage) * C.offline_gold_factor * artv("moonwell")
+	return seconds / kt * gold_kill(stage) * C.offline_gold_factor * artv("moonwell") * (1.0 + tv("t_off"))
 
 ## Daily login gems; returns amount granted (0 if already claimed today).
 func claim_daily() -> int:
 	var today := Time.get_date_string_from_system()
+	new_day(today)
 	if last_daily == today: return 0
 	last_daily = today; add_gems(int(S.gems.daily_login)); return int(S.gems.daily_login)
 
@@ -190,6 +246,8 @@ func unlock(key: String) -> void:
 
 func on_stage_cleared(new_stage: int) -> void:
 	unlock("first_boss")
+	stats.bosses += 1; qp("bosses")
+	if new_stage > max_stage and new_stage % int(K.pets.egg_every_stages) == 1 and new_stage > 1: eggs += 1
 	if new_stage > max_stage and new_stage % 10 == 1: add_gems(int(S.gems.boss_every_10_first_clear))
 	for m in [50, 100, 200]:
 		if new_stage >= m: unlock("stage_%d" % m)
@@ -197,6 +255,175 @@ func on_stage_cleared(new_stage: int) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		save_game()
+
+# ================= Phase 3: meta-progression (gear, pets, tree, streak, quests, raid) =================
+func tv(id: String) -> float:
+	for b in K.tree.branches.values():
+		for n in b:
+			if n[0] == id: return float(n[1]) * int(tree.get(id, 0))
+	return 0.0
+
+func tree_points() -> int: return int(max_stage / int(K.tree.stages_per_point))
+func tree_spent() -> int:
+	var n := 0
+	for k in tree: n += int(tree[k])
+	return n
+func tree_buy(id: String) -> bool:
+	if tree_spent() >= tree_points() or int(tree[id]) >= int(K.tree.max): return false
+	tree[id] = int(tree[id]) + 1; changed.emit(); save_game(); return true
+func tree_respec() -> bool:
+	if tree_spent() == 0 or not spend_gems(int(K.tree.respec_cost)): return false
+	for k in tree: tree[k] = 0
+	changed.emit(); return true
+
+func gear_by_id(id: int) -> Dictionary:
+	for g in gear:
+		if int(g.id) == id: return g
+	return {}
+func gear_value(g: Dictionary) -> float:
+	return float(K.gear.rarity_base[int(g.r)]) * (1.0 + float(K.gear.enhance_per_level) * int(g.lv))
+func gear_stat(stat: String) -> float:
+	var v := 0.0
+	for slot in equipped:
+		var g := gear_by_id(int(equipped[slot]))
+		if not g.is_empty() and K.gear.slot_stat[slot] == stat: v += gear_value(g)
+	return v
+func set_count(set_id: String) -> int:
+	var n := 0
+	for slot in equipped:
+		var g := gear_by_id(int(equipped[slot]))
+		if not g.is_empty() and g.set == set_id: n += 1
+	return n
+## 2 pieces = half bonus, 4 pieces = full bonus.
+func set_bonus(set_id: String) -> float:
+	var n := set_count(set_id); var full: float = K.gear.sets[set_id].full
+	return full if n >= 4 else (full * 0.5 if n >= 2 else 0.0)
+func pet_v(stat: String) -> float:
+	for p in K.pets.list:
+		if p.stat == stat and active_pet == p.id: return float(p.per_level) * int(pets[p.id])
+	return 0.0
+
+func tap_mult() -> float:
+	return (1.0 + gear_stat("tap")) * (1.0 + gear_stat("all")) * (1.0 + set_bonus("ember")) * (1.0 + pet_v("tap")) * (1.0 + tv("t_tap"))
+func ally_mult() -> float:
+	return (1.0 + gear_stat("ally")) * (1.0 + gear_stat("all")) * (1.0 + pet_v("ally")) * (1.0 + tv("t_ally"))
+func gold_mult() -> float:
+	return (1.0 + gear_stat("gold")) * (1.0 + set_bonus("verdant")) * (1.0 + pet_v("gold")) * (1.0 + tv("t_gold")) * festival_gold()
+func crit_chance() -> float: return C.crit_chance + pet_v("crit") + tv("t_crit")
+func crit_mult() -> float: return C.crit_mult * (1.0 + tv("t_critd"))
+func cooldown_mult() -> float: return max(0.5, 1.0 - tv("t_cd"))
+func pet_damage() -> float:
+	if active_pet == "": return 0.0
+	return tap_dmg() * (3.0 + int(pets[active_pet])) * (1.0 + set_bonus("storm")) * (1.0 + tv("t_pet"))
+func festival() -> bool:
+	var wd: int = Time.get_datetime_dict_from_system().weekday
+	return wd == 0 or wd == 6
+func festival_gold() -> float: return float(K.festival.gold_mult) if festival() else 1.0
+
+## Rolls a gear piece. min_r forces at least that rarity (crafting).
+func roll_gear(min_r := 0) -> Dictionary:
+	if gear.size() >= int(K.gear.inventory_cap): return {}
+	var w: Array = K.gear.rarity_weights; var tot := 0.0
+	for x in w: tot += x
+	var roll := randf() * tot; var r := 0
+	for i in w.size():
+		roll -= w[i]
+		if roll <= 0: r = i; break
+	r = max(r, min_r)
+	var g := {"id": gear_uid, "slot": K.gear.slots[randi() % 4], "r": r, "set": K.gear.sets.keys()[randi() % 4], "lv": 0}
+	gear_uid += 1; gear.append(g)
+	if not equipped.has(g.slot): equipped[g.slot] = g.id
+	if r == 3: unlock("legendary")
+	changed.emit(); return g
+func enhance_cost(g: Dictionary) -> int: return (int(g.lv) + 1) * int(K.gear.enhance_cost[int(g.r)])
+func enhance(g: Dictionary) -> bool:
+	var c := enhance_cost(g)
+	if int(g.lv) >= int(K.gear.enhance_max) or essence < c: return false
+	essence -= c; g.lv = int(g.lv) + 1; changed.emit(); save_game(); return true
+func salvage(g: Dictionary) -> void:
+	for slot in equipped.keys():
+		if int(equipped[slot]) == int(g.id): equipped.erase(slot)
+	essence += int(K.gear.salvage[int(g.r)]); gear.erase(g); changed.emit(); save_game()
+func equip(g: Dictionary) -> void: equipped[g.slot] = int(g.id); changed.emit(); save_game()
+func craft() -> Dictionary:
+	if essence < int(K.gear.craft_cost) or gear.size() >= int(K.gear.inventory_cap): return {}
+	essence -= int(K.gear.craft_cost); return roll_gear(1)
+
+func pets_unlocked() -> bool: return max_stage >= int(K.pets.unlock_stage)
+## Hatches one egg: +1 level for a random pet. Returns the pet id.
+func hatch() -> String:
+	if eggs <= 0: return ""
+	eggs -= 1
+	var p: Dictionary = K.pets.list[randi() % K.pets.list.size()]
+	pets[p.id] = int(pets[p.id]) + 1
+	if active_pet == "": active_pet = p.id
+	unlock("first_pet"); changed.emit(); save_game(); return p.id
+
+## Day rollover: streak, quests, raid tickets.
+func new_day(today: String) -> void:
+	if raid_day != today: raid_day = today; raid_tickets = int(K.raid.tickets)
+	if quest_day != today:
+		quest_day = today; quest_bonus = false; quests = []
+		var pool: Array = K.quests.pool.duplicate(); pool.shuffle()
+		for q in pool.slice(0, int(K.quests.per_day)): quests.append({"k": q.k, "goal": int(q.goal), "p": 0, "done": false})
+	save_game()
+
+func _yesterday() -> String:
+	return Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_system()) - 86400)
+
+## 7-day login calendar. Returns the reward dict granted today (empty if claimed already).
+func claim_streak() -> Dictionary:
+	var today := Time.get_date_string_from_system()
+	if streak_day == today: return {}
+	if streak_day != _yesterday() or streak >= 7: streak = 0
+	var r: Dictionary = K.streak[streak]
+	streak += 1; streak_day = today
+	grant(r)
+	if streak == 7: unlock("streak_7")
+	return r
+
+func grant(r: Dictionary) -> void:
+	if r.has("gems"): gems += int(r.gems)
+	if r.has("essence"): essence += int(r.essence)
+	if r.has("eggs"): eggs += int(r.eggs)
+	if r.has("warp_h"): gold += offline_income(float(r.warp_h) * 3600.0)
+	gems_changed.emit(); changed.emit(); save_game()
+
+## Quest progress hook.
+func qp(kind: String, n := 1) -> void:
+	for q in quests:
+		if q.k == kind and not q.done:
+			q.p = min(int(q.goal), int(q.p) + n)
+			if int(q.p) >= int(q.goal):
+				q.done = true
+				grant({"gems": K.quests.reward_gems, "essence": K.quests.reward_essence})
+				quest_done.emit(tr_("quest_done") % tr_("q_" + kind))
+	if not quest_bonus and quests.size() > 0 and quests.all(func(q): return q.done):
+		quest_bonus = true; grant({"eggs": K.quests.all_bonus_eggs}); unlock("quests_all")
+		quest_done.emit(tr_("quest_all"))
+
+## Raid score: tier*100 + percent into the next tier, for absolute damage dealt.
+func raid_hp(k: int) -> float: return float(K.raid.tier_hp) * pow(float(K.raid.tier_growth), k)
+func raid_score(total: float) -> int:
+	var k := 0; var left := total
+	while left >= raid_hp(k) and k < 2000: left -= raid_hp(k); k += 1
+	return k * 100 + int(100.0 * left / raid_hp(k))
+func raid_fmt(score: int) -> String: return "%d.%02d" % [score / 100, score % 100]
+func raid_finish(score: int) -> Dictionary:
+	var tier := score / 100
+	var r := {"gems": int(K.raid.reward_gems_base) + tier, "essence": int(K.raid.reward_essence_base) + 2 * tier}
+	if randf() < float(K.raid.egg_chance): r.eggs = 1
+	raid_best = max(raid_best, score); stats.raids += 1
+	if tier >= 10: unlock("raid_10")
+	grant(r); qp("raid"); return r
+
+## Wipes game progress (keeps settings, language and Play purchases so paid items are not lost).
+func reset_all() -> void:
+	var keep := {"owned": owned, "tokens": processed_tokens, "settings": settings, "lang": lang}
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
+	from_dict(keep); offline_gold = 0.0; offline_full = false; auto_tap_left = 0.0
+	if not owned.has(aura): aura = ""
+	new_day(Time.get_date_string_from_system())
 
 const SUF := ["", "K", "M", "B", "T"]
 func fmt(x: float) -> String:
@@ -210,8 +437,9 @@ func fmt(x: float) -> String:
 		s = char(97 + (k / 26) % 26) + char(97 + k % 26)
 	return ("%.2f" % m if m < 10 else "%.1f" % m if m < 100 else "%d" % int(m)) + s
 
+var _i18n_extra := {}
 func tr_(key: String) -> String:
-	var d: Dictionary = I18N.get(key, {})
+	var d: Dictionary = I18N.get(key, _i18n_extra.get(key, {}))
 	return d.get(lang, d.get("en", key))
 
 const I18N := {

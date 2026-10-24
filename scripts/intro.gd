@@ -17,8 +17,6 @@ var seq: Tween
 var menu_shown := false
 var leaving := false
 var t := 0.0
-var sting: AudioStreamPlayer
-var whoosh: AudioStreamPlayer
 
 func _ready() -> void:
 	G = Game
@@ -70,15 +68,13 @@ func _ready() -> void:
 	skip_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; add_child(skip_lbl)
 	flash = ColorRect.new(); flash.size = Vector2(1080, 1920); flash.color = Color(1, 0.95, 0.85, 0); flash.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(flash)
-	sting = AudioStreamPlayer.new(); sting.stream = load("res://assets/audio/sting.wav"); add_child(sting)
-	whoosh = AudioStreamPlayer.new(); whoosh.stream = load("res://assets/audio/whoosh.wav"); add_child(whoosh)
-	if G.sound_on: sting.play()
+	Sound.play("sting", false); Sound.music("menu", 0.5)
 	# --- sequence
 	seq = create_tween()
 	seq.tween_property(art, "modulate:a", 1.0, 1.2)
 	seq.parallel().tween_property(rays, "modulate:a", 0.55, 1.0).set_delay(0.3)
 	seq.parallel().tween_property(shard, "scale", Vector2.ONE, 1.1).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT).set_delay(0.3)
-	seq.tween_callback(func(): if G.sound_on: whoosh.play())
+	seq.tween_callback(func(): Sound.play("whoosh", false))
 	seq.tween_property(dragon, "position", Vector2(1300, -250), 1.0).set_trans(Tween.TRANS_SINE)
 	seq.parallel().tween_property(dragon, "scale", Vector2(1.5, 1.5), 1.0)
 	seq.tween_callback(_flash_burst)

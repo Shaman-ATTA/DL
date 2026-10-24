@@ -1,0 +1,240 @@
+{
+ "_comment": "Meta-progression content (Phase 3). Read by scripts/game.gd and sim/simulate.py.",
+ "gear": {
+  "slots": [
+   "weapon",
+   "helm",
+   "armor",
+   "charm"
+  ],
+  "slot_stat": {
+   "weapon": "tap",
+   "helm": "gold",
+   "armor": "ally",
+   "charm": "all"
+  },
+  "rarity_base": [
+   0.05,
+   0.12,
+   0.25,
+   0.5
+  ],
+  "rarity_weights": [
+   60,
+   28,
+   10,
+   2
+  ],
+  "rarity_colors": [
+   "#b8b8b8",
+   "#4aa3ff",
+   "#b65cff",
+   "#ffb02e"
+  ],
+  "enhance_per_level": 0.06,
+  "enhance_max": 10,
+  "enhance_cost": [
+   3,
+   6,
+   12,
+   25
+  ],
+  "salvage": [
+   2,
+   6,
+   15,
+   40
+  ],
+  "craft_cost": 50,
+  "boss_drop_chance": 0.1,
+  "guaranteed_every": 10,
+  "inventory_cap": 30,
+  "sets": {
+   "ember": {
+    "stat": "tap",
+    "full": 1.0
+   },
+   "frost": {
+    "stat": "boss_time",
+    "full": 5.0
+   },
+   "verdant": {
+    "stat": "gold",
+    "full": 1.0
+   },
+   "storm": {
+    "stat": "pet",
+    "full": 2.0
+   }
+  }
+ },
+ "pets": {
+  "unlock_stage": 8,
+  "strike_every": 10,
+  "list": [
+   {
+    "id": "drake",
+    "stat": "tap",
+    "per_level": 0.08
+   },
+   {
+    "id": "owl",
+    "stat": "gold",
+    "per_level": 0.06
+   },
+   {
+    "id": "sprite",
+    "stat": "ally",
+    "per_level": 0.08
+   },
+   {
+    "id": "ferret",
+    "stat": "crit",
+    "per_level": 0.005
+   }
+  ],
+  "egg_gem_cost": 80,
+  "egg_every_stages": 25
+ },
+ "tree": {
+  "max": 5,
+  "stages_per_point": 25,
+  "respec_cost": 50,
+  "branches": {
+   "blade": [
+    [
+     "t_tap",
+     0.08
+    ],
+    [
+     "t_crit",
+     0.005
+    ],
+    [
+     "t_critd",
+     0.06
+    ],
+    [
+     "t_pet",
+     0.2
+    ]
+   ],
+   "command": [
+    [
+     "t_ally",
+     0.08
+    ],
+    [
+     "t_cd",
+     0.05
+    ],
+    [
+     "t_boss",
+     1.0
+    ],
+    [
+     "t_off",
+     0.2
+    ]
+   ],
+   "fortune": [
+    [
+     "t_gold",
+     0.1
+    ],
+    [
+     "t_bossg",
+     0.3
+    ],
+    [
+     "t_fairy",
+     0.2
+    ],
+    [
+     "t_gear",
+     0.02
+    ]
+   ]
+  }
+ },
+ "streak": [
+  {
+   "gems": 20
+  },
+  {
+   "essence": 20
+  },
+  {
+   "eggs": 1
+  },
+  {
+   "gems": 40
+  },
+  {
+   "warp_h": 2
+  },
+  {
+   "essence": 50
+  },
+  {
+   "eggs": 1,
+   "gems": 80
+  }
+ ],
+ "quests": {
+  "per_day": 3,
+  "pool": [
+   {
+    "k": "taps",
+    "goal": 600
+   },
+   {
+    "k": "kills",
+    "goal": 120
+   },
+   {
+    "k": "bosses",
+    "goal": 8
+   },
+   {
+    "k": "skills",
+    "goal": 10
+   },
+   {
+    "k": "upgrades",
+    "goal": 40
+   },
+   {
+    "k": "fairies",
+    "goal": 3
+   },
+   {
+    "k": "raid",
+    "goal": 1
+   }
+  ],
+  "reward_gems": 15,
+  "reward_essence": 10,
+  "all_bonus_eggs": 1
+ },
+ "fairy": {
+  "min_s": 45,
+  "max_s": 90,
+  "gold_seconds": 60,
+  "gems": 10,
+  "essence": 8
+ },
+ "raid": {
+  "tickets": 3,
+  "seconds": 30,
+  "tier_hp": 100.0,
+  "tier_growth": 1.6,
+  "reward_gems_base": 5,
+  "reward_essence_base": 10,
+  "egg_chance": 0.2
+ },
+ "festival": {
+  "gold_mult": 1.5,
+  "fairy_rate": 2.0
+ }
+}

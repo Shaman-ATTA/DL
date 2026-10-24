@@ -5,6 +5,8 @@
   "_game_id_note": "Numeric Project ID from Play Console > Play Games Services > Configuration. Also put it into the Android export preset option godot_play_game_services/game_id.",
   "cloud_save_name": "dragonshard_main",
   "leaderboard_max_stage": "",
+  "leaderboard_raid": "",
+  "_leaderboards_note": "Create two leaderboards in Play Console (Play Games Services > Leaderboards): 'Max stage' (integer, higher is better) and 'Rift Raid' (integer, higher is better; score = tier*100 + percent, shown in game as Tier X.YY). Play Games keeps daily, weekly and all-time spans for every leaderboard automatically; the weekly span resets every Sunday ~00:00 PT. Paste the IDs (CgkI...) here.",
   "achievements": {
    "first_boss": "",
    "stage_50": "",
@@ -12,7 +14,12 @@
    "stage_200": "",
    "first_prestige": "",
    "all_allies": "",
-   "taps_10k": ""
+   "taps_10k": "",
+   "first_pet": "",
+   "legendary": "",
+   "streak_7": "",
+   "quests_all": "",
+   "raid_10": ""
   }
  },
  "billing": {
@@ -33,7 +40,8 @@
    "reset_cooldowns": 15,
    "time_warp_hours": 2, "time_warp_cost": 60,
    "auto_tapper_minutes": 10, "auto_tapper_cost": 40, "auto_tapper_tps": 5,
-   "aura_cost": 150
+   "aura_cost": 150,
+   "egg_cost": 80
   }
  }
 }
