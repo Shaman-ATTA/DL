@@ -16,14 +16,28 @@ var sound_on := true
 var music_on := true
 var lang := "ru"
 var offline_gold := 0.0
+var gems := 0
+var owned: Dictionary = {}        # non-consumable unlocks: "supporter", "vip", "aura_fire" ...
+var aura := ""                    # equipped cosmetic aura
+var ach: Dictionary = {}          # locally unlocked achievements
+var prestiges := 0
+var last_daily := ""
+var auto_tap_left := 0.0
+var processed_tokens: Dictionary = {}  # purchase tokens already granted (idempotency)
+var S: Dictionary                 # data/services.json
+signal achievement(key: String)
+signal gems_changed
+signal click
 const SAVE := "user://save.json"
 
 func _ready() -> void:
 	C = JSON.parse_string(FileAccess.get_file_as_string("res://data/balance.json"))
+	S = JSON.parse_string(FileAccess.get_file_as_string("res://data/services.json"))
 	comp.resize(C.companions.size()); comp.fill(0)
 	for a in C.artifacts: art[a.id] = 0
 	if OS.get_locale_language() != "ru": lang = "en"
 	load_game()
+	_dev_lang()
 
 func hp(s: int) -> float:
 	var L: int = int(C.late_growth_from_stage)
@@ -72,7 +86,7 @@ func comp_cost(i: int) -> float:
 	return ceil(C.companions[i].base_cost * pow(C.companion_cost_growth, comp[i]))
 
 func gold_kill(s: int, boss := false) -> float:
-	var g: float = hp(s) * C.gold_per_hp * artv("crown")
+	var g: float = hp(s) * C.gold_per_hp * artv("crown") * (S.gems.vip_gold_mult if owned.has("vip") else 1.0)
 	return g * (C.boss_gold_mult if boss else 1.0)
 
 func boss_time() -> float: return C.boss_time + artv("hourglass")
@@ -94,7 +108,9 @@ func buy_hero() -> bool:
 func buy_comp(i: int) -> bool:
 	var c := comp_cost(i)
 	if gold < c: return false
-	gold -= c; comp[i] += 1; changed.emit(); return true
+	gold -= c; comp[i] += 1
+	if not comp.has(0): unlock("all_allies")
+	changed.emit(); return true
 
 func buy_art(id: String) -> bool:
 	var a := art_def(id); var c := art_cost(id)
@@ -106,32 +122,77 @@ func prestige() -> int:
 	if s <= 0: return 0
 	shards += s; gold = 0; hero_lv = 1; comp.fill(0)
 	stage = 1 + int(artv("start_stage")); run_max = stage; kills = 0
+	prestiges += 1; unlock("first_prestige")
 	changed.emit(); save_game(); return s
 
-func save_game() -> void:
-	var d := {"v": 1, "gold": gold, "shards": shards, "hero": hero_lv, "comp": comp, "art": art,
+## Dev screenshot args carry the language as their last comma field.
+func _dev_lang() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--shot=") or a.begins_with("--intro-shot="): lang = a.split(",")[-1]
+
+func to_dict() -> Dictionary:
+	return {"v": 2, "gold": gold, "shards": shards, "hero": hero_lv, "comp": comp, "art": art,
 		"stage": stage, "max": max_stage, "run_max": run_max, "taps": total_taps, "snd": sound_on,
-		"mus": music_on, "lang": lang, "t": Time.get_unix_time_from_system()}
+		"mus": music_on, "lang": lang, "t": Time.get_unix_time_from_system(), "gems": gems, "owned": owned,
+		"aura": aura, "ach": ach, "prestiges": prestiges, "daily": last_daily, "tokens": processed_tokens}
+
+func from_dict(d: Dictionary) -> void:
+	gold = d.get("gold", 0.0); shards = int(d.get("shards", 0)); hero_lv = int(d.get("hero", 1))
+	var cs: Array = d.get("comp", [])
+	comp.fill(0)
+	for i in min(cs.size(), comp.size()): comp[i] = int(cs[i])
+	var ar: Dictionary = d.get("art", {})
+	for k in art: art[k] = int(ar.get(k, 0))
+	stage = int(d.get("stage", 1)); max_stage = int(d.get("max", 1)); run_max = int(d.get("run_max", stage))
+	total_taps = int(d.get("taps", 0)); sound_on = d.get("snd", true); music_on = d.get("mus", true); lang = d.get("lang", lang)
+	gems = int(d.get("gems", 0)); owned = d.get("owned", {}); aura = d.get("aura", ""); ach = d.get("ach", {})
+	prestiges = int(d.get("prestiges", 0)); last_daily = d.get("daily", ""); processed_tokens = d.get("tokens", {})
+
+## Progress score used to resolve local vs cloud save conflicts.
+func progress_score(d: Dictionary) -> float:
+	return float(d.get("prestiges", 0)) * 1e6 + float(d.get("max", 1)) * 1e3 + float(d.get("shards", 0)) * 1e-3
+
+func save_game() -> void:
 	var f := FileAccess.open(SAVE, FileAccess.WRITE)
-	if f: f.store_string(JSON.stringify(d))
+	if f: f.store_string(JSON.stringify(to_dict()))
 
 func load_game() -> void:
 	if not FileAccess.file_exists(SAVE): return
 	var d = JSON.parse_string(FileAccess.get_file_as_string(SAVE))
 	if typeof(d) != TYPE_DICTIONARY: return
-	gold = d.get("gold", 0.0); shards = int(d.get("shards", 0)); hero_lv = int(d.get("hero", 1))
-	var cs: Array = d.get("comp", [])
-	for i in min(cs.size(), comp.size()): comp[i] = int(cs[i])
-	var ar: Dictionary = d.get("art", {})
-	for k in ar: if art.has(k): art[k] = int(ar[k])
-	stage = int(d.get("stage", 1)); max_stage = int(d.get("max", 1)); run_max = int(d.get("run_max", stage))
-	total_taps = int(d.get("taps", 0)); sound_on = d.get("snd", true); music_on = d.get("mus", true); lang = d.get("lang", lang)
+	from_dict(d)
 	var dt: float = clamp(Time.get_unix_time_from_system() - float(d.get("t", 0)), 0, C.offline_cap_hours * 3600.0)
+	if dt > 60: offline_gold = offline_income(dt); gold += offline_gold
+
+func offline_income(seconds: float) -> float:
 	var d_ := dps()
-	if dt > 60 and d_ > 0:
-		var kt: float = max(hp(stage) / d_, C.respawn_delay)
-		offline_gold = dt / kt * gold_kill(stage) * C.offline_gold_factor * artv("moonwell")
-		gold += offline_gold
+	if d_ <= 0: return 0.0
+	var kt: float = max(hp(stage) / d_, C.respawn_delay)
+	return seconds / kt * gold_kill(stage) * C.offline_gold_factor * artv("moonwell")
+
+## Daily login gems; returns amount granted (0 if already claimed today).
+func claim_daily() -> int:
+	var today := Time.get_date_string_from_system()
+	if last_daily == today: return 0
+	last_daily = today; add_gems(int(S.gems.daily_login)); return int(S.gems.daily_login)
+
+func add_gems(n: int) -> void:
+	gems += n; gems_changed.emit(); save_game()
+
+func spend_gems(n: int) -> bool:
+	if gems < n: return false
+	gems -= n; gems_changed.emit(); save_game(); return true
+
+func unlock(key: String) -> void:
+	if ach.has(key): return
+	ach[key] = true; gems += int(S.gems.achievement_reward); gems_changed.emit()
+	achievement.emit(key)
+
+func on_stage_cleared(new_stage: int) -> void:
+	unlock("first_boss")
+	if new_stage > max_stage and new_stage % 10 == 1: add_gems(int(S.gems.boss_every_10_first_clear))
+	for m in [50, 100, 200]:
+		if new_stage >= m: unlock("stage_%d" % m)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
@@ -154,6 +215,62 @@ func tr_(key: String) -> String:
 	return d.get(lang, d.get("en", key))
 
 const I18N := {
+	"tab_shop": {"en": "Shop", "ru": "Лавка"},
+	"gems": {"en": "Gems", "ru": "Самоцветы"},
+	"play": {"en": "PLAY", "ru": "ИГРАТЬ"},
+	"tap_skip": {"en": "Tap to skip", "ru": "Коснитесь, чтобы пропустить"},
+	"subtitle": {"en": "Tap. Slay. Restore the Shard.", "ru": "Касайся. Сражайся. Верни Осколок."},
+	"gsign": {"en": "Sign in with Google Play", "ru": "Войти через Google Play"},
+	"gsigned": {"en": "Google Play Games: signed in", "ru": "Google Play Игры: вход выполнен"},
+	"gunavail": {"en": "Google Play Games unavailable on this device/build", "ru": "Google Play Игры недоступны на этом устройстве/сборке"},
+	"cloud_save": {"en": "Save to cloud", "ru": "Сохранить в облако"},
+	"cloud_load": {"en": "Load from cloud", "ru": "Загрузить из облака"},
+	"cloud_saved": {"en": "Saved to cloud", "ru": "Сохранено в облаке"},
+	"cloud_found": {"en": "A cloud save with more progress was found (best stage %d). Load it?", "ru": "Найдено облачное сохранение с большим прогрессом (лучший этап %d). Загрузить?"},
+	"cloud_none": {"en": "No cloud save found", "ru": "Облачное сохранение не найдено"},
+	"yes": {"en": "Yes", "ru": "Да"}, "no": {"en": "No", "ru": "Нет"},
+	"achievements": {"en": "Achievements", "ru": "Достижения"},
+	"leaderboard": {"en": "Leaderboard", "ru": "Таблица рекордов"},
+	"restore": {"en": "Restore purchases", "ru": "Восстановить покупки"},
+	"restored": {"en": "Purchases restored", "ru": "Покупки восстановлены"},
+	"billing_unavail": {"en": "Store unavailable. Purchases work only in the Google Play version.", "ru": "Магазин недоступен. Покупки работают только в версии из Google Play."},
+	"buy_ok": {"en": "Thank you for your support!", "ru": "Спасибо за поддержку!"},
+	"pending": {"en": "Payment pending. The reward arrives when it completes.", "ru": "Платёж обрабатывается. Награда придёт после завершения."},
+	"owned": {"en": "OWNED", "ru": "КУПЛЕНО"},
+	"p_gems_small": {"en": "Pouch of Gems: %d gems", "ru": "Мешочек самоцветов: %d"},
+	"p_gems_medium": {"en": "Chest of Gems: %d gems", "ru": "Сундук самоцветов: %d"},
+	"p_gems_large": {"en": "Dragon Hoard: %d gems", "ru": "Сокровища дракона: %d"},
+	"p_starter_pack": {"en": "Supporter Pack: %d gems + Golden Aura + badge", "ru": "Набор покровителя: %d самоцветов + Золотая аура + значок"},
+	"p_vip_pack": {"en": "Royal Treasury (VIP): permanent x2 gold", "ru": "Королевская казна (VIP): золото x2 навсегда"},
+	"g_reset": {"en": "Refresh all spell cooldowns", "ru": "Сбросить перезарядку заклинаний"},
+	"g_warp": {"en": "Time Warp: collect %dh of ally gold now", "ru": "Искажение времени: сразу получить золото за %d ч"},
+	"g_auto": {"en": "Spirit Familiar: auto-tap %d/s for %d min", "ru": "Дух-фамильяр: автоатака %d/с на %d мин"},
+	"g_aura_fire": {"en": "Ember Aura (cosmetic)", "ru": "Аура углей (внешний вид)"},
+	"g_aura_frost": {"en": "Frost Aura (cosmetic)", "ru": "Аура инея (внешний вид)"},
+	"g_aura_arcane": {"en": "Arcane Aura (cosmetic)", "ru": "Тайная аура (внешний вид)"},
+	"g_aura_gold": {"en": "Golden Aura (supporters)", "ru": "Золотая аура (для покровителей)"},
+	"equip": {"en": "Equip", "ru": "Надеть"}, "equipped": {"en": "Equipped", "ru": "Надето"},
+	"premium": {"en": "Support the developer", "ru": "Поддержать разработчика"},
+	"spend": {"en": "Spend gems", "ru": "Потратить самоцветы"},
+	"daily": {"en": "Daily gift: +%d gems!", "ru": "Ежедневный подарок: +%d самоцветов!"},
+	"ach_get": {"en": "Achievement: %s (+%d gems)", "ru": "Достижение: %s (+%d самоцветов)"},
+	"ach_first_boss": {"en": "First Boss Slain", "ru": "Первый босс повержен"},
+	"ach_stage_50": {"en": "Stage 50", "ru": "Этап 50"},
+	"ach_stage_100": {"en": "Stage 100", "ru": "Этап 100"},
+	"ach_stage_200": {"en": "Stage 200", "ru": "Этап 200"},
+	"ach_first_prestige": {"en": "Shard Shatterer", "ru": "Раскалыватель Осколков"},
+	"ach_all_allies": {"en": "Full Fellowship", "ru": "Полный отряд"},
+	"ach_taps_10k": {"en": "10,000 Strikes", "ru": "10 000 ударов"},
+	"level_up": {"en": "LEVEL UP!", "ru": "НОВЫЙ УРОВЕНЬ!"},
+	"stage_clear": {"en": "Stage %d", "ru": "Этап %d"},
+	"b_forest": {"en": "Whispering Woods", "ru": "Шепчущий лес"},
+	"b_cave": {"en": "Crystal Depths", "ru": "Хрустальные глубины"},
+	"b_lava": {"en": "Emberfall Wastes", "ru": "Пепельные пустоши"},
+	"b_ice": {"en": "Frostcrown Peaks", "ru": "Вершины Ледяной Короны"},
+	"prestige_done": {"en": "+%s Dragon Shards!", "ru": "+%s Драконьих Осколков!"},
+	"vip": {"en": "VIP", "ru": "VIP"},
+	"supporter": {"en": "Supporter", "ru": "Покровитель"},
+
 	"title": {"en": "Dragonshard Legends", "ru": "Легенды Драконьего Осколка"},
 	"stage": {"en": "Stage", "ru": "Этап"},
 	"boss": {"en": "BOSS", "ru": "БОСС"},
@@ -178,7 +295,7 @@ const I18N := {
 	"ok": {"en": "OK", "ru": "OK"},
 	"unlock_at": {"en": "Unlocks at hero Lv %d", "ru": "Откроется на %d ур. героя"},
 	"story": {"en": "The Dragon Shard that kept the realm of Elaria in peace has shattered. Monsters pour out of every biome. Gather allies, master spells and recover the shards, Shardbearer!", "ru": "Драконий Осколок, хранивший мир Эларии, раскололся. Из всех земель хлынули чудовища. Собери союзников, освой заклинания и верни осколки, Хранитель!"},
-	"privacy": {"en": "Privacy: the game collects no personal data. Progress is stored only on your device.", "ru": "Конфиденциальность: игра не собирает личные данные. Прогресс хранится только на устройстве."},
+	"privacy": {"en": "Privacy: the game itself collects no personal data. Progress is stored on your device and, if you sign in, in your Google Play Games cloud save. Purchases are processed by Google Play.", "ru": "Конфиденциальность: игра сама не собирает личные данные. Прогресс хранится на устройстве и, при входе, в облаке Google Play Игр. Покупки обрабатывает Google Play."},
 	"best": {"en": "Best stage", "ru": "Лучший этап"},
 	"failed": {"en": "The boss escaped!", "ru": "Босс ускользнул!"},
 	"c1": {"en": "Lirael the Archer", "ru": "Лираэль-Лучница"},

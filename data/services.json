@@ -1,0 +1,39 @@
+{
+ "_comment": "All Google Play IDs live here. Fill in the values from Play Console. Empty IDs are skipped safely.",
+ "play_games": {
+  "game_id": "",
+  "_game_id_note": "Numeric Project ID from Play Console > Play Games Services > Configuration. Also put it into the Android export preset option godot_play_game_services/game_id.",
+  "cloud_save_name": "dragonshard_main",
+  "leaderboard_max_stage": "",
+  "achievements": {
+   "first_boss": "",
+   "stage_50": "",
+   "stage_100": "",
+   "stage_200": "",
+   "first_prestige": "",
+   "all_allies": "",
+   "taps_10k": ""
+  }
+ },
+ "billing": {
+  "products": [
+   {"id": "gems_small", "type": "consumable", "gems": 120, "fallback_price": "$0.99"},
+   {"id": "gems_medium", "type": "consumable", "gems": 650, "fallback_price": "$4.99"},
+   {"id": "gems_large", "type": "consumable", "gems": 1400, "fallback_price": "$9.99"},
+   {"id": "starter_pack", "type": "non_consumable", "gems": 500, "unlock": "supporter", "fallback_price": "$2.99"},
+   {"id": "vip_pack", "type": "non_consumable", "gems": 0, "unlock": "vip", "fallback_price": "$7.99"}
+  ]
+ },
+ "gems": {
+  "daily_login": 20,
+  "boss_every_10_first_clear": 10,
+  "achievement_reward": 25,
+  "vip_gold_mult": 2.0,
+  "sinks": {
+   "reset_cooldowns": 15,
+   "time_warp_hours": 2, "time_warp_cost": 60,
+   "auto_tapper_minutes": 10, "auto_tapper_cost": 40, "auto_tapper_tps": 5,
+   "aura_cost": 150
+  }
+ }
+}

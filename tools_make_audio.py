@@ -28,3 +28,20 @@ for rep in range(4):
             bar[i*step:(i+1)*step]+=0.12*np.sin(2*np.pi*f(m)*s)*np.exp(-s*6)
         out.append(bar)
 save("music",np.concatenate(out)*0.8)
+# --- phase 2 additions ---
+tt=t(2.4)  # intro sting: noise swell into a bright A-major chord
+sw=rng.uniform(-1,1,len(tt))*np.clip(tt/1.0,0,1)**2*(tt<1.05)*0.35
+ch=sum(np.sin(2*np.pi*f*tt)+0.3*np.sin(4*np.pi*f*tt) for f in (220,277.2,329.6,440,554.4))*0.09*(tt>1.0)*np.exp(-np.clip(tt-1.0,0,None)*1.6)
+boom=0.6*np.sin(2*np.pi*(60-20*np.clip(tt-1,0,1))*tt)*(tt>1.0)*np.exp(-np.clip(tt-1.0,0,None)*5)
+save("sting",sw+ch+boom)
+x=np.concatenate([0.3*(np.sin(2*np.pi*f*t(0.12))+0.4*np.sin(4*np.pi*f*t(0.12)))*np.exp(-t(0.12)*10) for f in (392,523,659,784)]+[0.3*np.sin(2*np.pi*1046*t(0.5))*np.exp(-t(0.5)*4)]); save("levelup",x)
+tt=t(1.6); save("prestige",0.4*np.sin(2*np.pi*(200+900*tt**2)*tt)*np.exp(-tt*1.5)+0.25*rng.uniform(-1,1,len(tt))*np.exp(-tt*3))
+tt=t(0.4); save("dissolve",0.35*rng.uniform(-1,1,len(tt))*np.exp(-tt*8)*np.sin(2*np.pi*(800-1500*tt)*tt)**2)
+tt=t(0.08); save("click",0.4*np.sin(2*np.pi*900*tt)*np.exp(-tt*60))
+tt=t(0.7); save("whoosh",0.4*rng.uniform(-1,1,len(tt))*np.sin(np.pi*tt/0.7)**2*np.convolve(np.ones(1),[1])[0])
+
+# Ship music as Ogg Vorbis (≈20x smaller than WAV).
+import os, subprocess
+if os.path.exists("assets/audio/music.wav"):
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", "assets/audio/music.wav", "-c:a", "libvorbis", "-q:a", "4", "assets/audio/music.ogg"], check=True)
+    os.remove("assets/audio/music.wav")
