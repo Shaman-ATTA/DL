@@ -1,0 +1,207 @@
+{
+ "version": 1,
+ "enemies_per_stage": 10,
+ "enemy_hp_base": 12.0,
+ "enemy_hp_growth": 1.39,
+ "enemy_hp_growth_late": 1.39,
+ "late_growth_from_stage": 100000,
+ "boss_hp_mult": 7.0,
+ "boss_time": 30.0,
+ "gold_per_hp": 0.06,
+ "boss_gold_mult": 6.0,
+ "respawn_delay": 0.35,
+ "offline_gold_factor": 0.5,
+ "offline_cap_hours": 12,
+ "crit_chance": 0.03,
+ "crit_mult": 8.0,
+ "hero": {
+  "base_cost": 6.0,
+  "cost_growth": 1.072,
+  "dmg_per_level": 1.0,
+  "milestone_every": 50,
+  "milestone_mult": 2.5,
+  "dps_to_tap_share": 0.02
+ },
+ "companion_cost_growth": 1.075,
+ "companion_milestones": [
+  [
+   10,
+   2.0
+  ],
+  [
+   25,
+   2.0
+  ],
+  [
+   50,
+   2.5
+  ],
+  [
+   100,
+   3.0
+  ],
+  [
+   150,
+   3.0
+  ],
+  [
+   200,
+   4.0
+  ],
+  [
+   300,
+   4.0
+  ],
+  [
+   400,
+   5.0
+  ],
+  [
+   500,
+   5.0
+  ]
+ ],
+ "companion_milestone_repeat_every": 100,
+ "companion_milestone_repeat_mult": 5.0,
+ "companions": [
+  {
+   "id": "c1",
+   "base_cost": 50,
+   "base_dps": 4
+  },
+  {
+   "id": "c2",
+   "base_cost": 600,
+   "base_dps": 30
+  },
+  {
+   "id": "c3",
+   "base_cost": 9000,
+   "base_dps": 280
+  },
+  {
+   "id": "c4",
+   "base_cost": 150000.0,
+   "base_dps": 3000
+  },
+  {
+   "id": "c5",
+   "base_cost": 3000000.0,
+   "base_dps": 36000
+  },
+  {
+   "id": "c6",
+   "base_cost": 70000000.0,
+   "base_dps": 500000.0
+  },
+  {
+   "id": "c7",
+   "base_cost": 2000000000.0,
+   "base_dps": 8000000.0
+  },
+  {
+   "id": "c8",
+   "base_cost": 70000000000.0,
+   "base_dps": 150000000.0
+  }
+ ],
+ "skills": [
+  {
+   "id": "blade",
+   "unlock_level": 5,
+   "cooldown": 45,
+   "duration": 0,
+   "power": 25.0
+  },
+  {
+   "id": "rage",
+   "unlock_level": 20,
+   "cooldown": 120,
+   "duration": 20,
+   "power": 3.0
+  },
+  {
+   "id": "haste",
+   "unlock_level": 40,
+   "cooldown": 150,
+   "duration": 20,
+   "power": 10.0
+  },
+  {
+   "id": "meteor",
+   "unlock_level": 70,
+   "cooldown": 120,
+   "duration": 20,
+   "power": 3.0
+  },
+  {
+   "id": "goldrain",
+   "unlock_level": 100,
+   "cooldown": 180,
+   "duration": 30,
+   "power": 2.0
+  },
+  {
+   "id": "ward",
+   "unlock_level": 140,
+   "cooldown": 90,
+   "duration": 0,
+   "power": 15.0
+  }
+ ],
+ "prestige": {
+  "min_stage": 50,
+  "base": 8.0,
+  "growth": 1.08
+ },
+ "artifacts": [
+  {
+   "id": "heart",
+   "effect": "all_dmg",
+   "per_level": 1.3,
+   "cost_base": 2,
+   "cost_growth": 1.22,
+   "max": 200
+  },
+  {
+   "id": "gauntlet",
+   "effect": "tap_dmg",
+   "per_level": 1.35,
+   "cost_base": 1,
+   "cost_growth": 1.22,
+   "max": 200
+  },
+  {
+   "id": "crown",
+   "effect": "gold",
+   "per_level": 1.25,
+   "cost_base": 2,
+   "cost_growth": 1.22,
+   "max": 200
+  },
+  {
+   "id": "hourglass",
+   "effect": "boss_time",
+   "per_level": 2.0,
+   "cost_base": 3,
+   "cost_growth": 1.8,
+   "max": 10
+  },
+  {
+   "id": "moonwell",
+   "effect": "offline",
+   "per_level": 1.25,
+   "cost_base": 3,
+   "cost_growth": 1.7,
+   "max": 50
+  },
+  {
+   "id": "wings",
+   "effect": "start_stage",
+   "per_level": 5,
+   "cost_base": 5,
+   "cost_growth": 2.0,
+   "max": 12
+  }
+ ]
+}

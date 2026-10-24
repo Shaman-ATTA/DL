@@ -1,0 +1,75 @@
+run   1: day   1.34  max stage   56  shards +   12  wall-clock  32.20 h  hero lv 118
+run   2: day   1.88  max stage   54  shards +   10  wall-clock  13.03 h  hero lv 131
+run   3: day   2.89  max stage   77  shards +   63  wall-clock  24.22 h  hero lv 163
+run   4: day   3.89  max stage   98  shards +  321  wall-clock  23.80 h  hero lv 227
+run   5: day   4.35  max stage  118  shards + 1499  wall-clock  11.03 h  hero lv 381
+run   6: day   4.72  max stage  130  shards + 3775  wall-clock   8.98 h  hero lv 513
+run   7: day   4.89  max stage  134  shards + 5136  wall-clock   4.08 h  hero lv 545
+run   8: day   5.53  max stage  143  shards +10268  wall-clock  15.42 h  hero lv 676
+run   9: day   5.89  max stage  145  shards +11976  wall-clock   8.49 h  hero lv 735
+run  10: day   6.34  max stage  152  shards +20526  wall-clock  11.00 h  hero lv 779
+run  11: day   6.72  max stage  155  shards +25857  wall-clock   9.02 h  hero lv 798
+run  12: day   6.89  max stage  151  shards +19005  wall-clock   4.05 h  hero lv 773
+run  13: day   7.34  max stage  157  shards +30160  wall-clock  10.95 h  hero lv 834
+run  14: day   7.72  max stage  158  shards +32572  wall-clock   8.95 h  hero lv 874
+run  15: day   7.89  max stage  159  shards +35178  wall-clock   4.03 h  hero lv 887
+run  16: day   8.35  max stage  161  shards +41032  wall-clock  11.02 h  hero lv 921
+run  17: day   8.72  max stage  166  shards +60290  wall-clock   8.98 h  hero lv 943
+run  18: day   8.89  max stage  163  shards +47860  wall-clock   4.11 h  hero lv 880
+run  19: day   9.53  max stage  168  shards +70322  wall-clock  15.39 h  hero lv 965
+run  20: day   9.89  max stage  170  shards +82023  wall-clock   8.52 h  hero lv 972
+run  21: day  10.35  max stage  171  shards +88585  wall-clock  11.00 h  hero lv 996
+run  22: day  10.72  max stage  172  shards +95672  wall-clock   8.95 h  hero lv 994
+run  23: day  10.89  max stage  173  shards +103326  wall-clock   4.07 h  hero lv 978
+run  24: day  11.34  max stage  176  shards +130161  wall-clock  10.96 h  hero lv 1029
+run  25: day  11.72  max stage  177  shards +140574  wall-clock   8.99 h  hero lv 1022
+run  26: day  11.89  max stage  175  shards +120520  wall-clock   4.06 h  hero lv 984
+run  27: day  12.35  max stage  179  shards +163966  wall-clock  10.96 h  hero lv 1015
+run  28: day  12.72  max stage  180  shards +177083  wall-clock   8.94 h  hero lv 1044
+run  29: day  12.89  max stage  182  shards +206550  wall-clock   4.08 h  hero lv 1045
+run  30: day  13.34  max stage  185  shards +260193  wall-clock  10.96 h  hero lv 1070
+run  31: day  13.72  max stage  186  shards +281009  wall-clock   8.95 h  hero lv 1085
+run  32: day  13.89  max stage  188  shards +327769  wall-clock   4.08 h  hero lv 1070
+run  33: day  14.53  max stage  191  shards +412894  wall-clock  15.43 h  hero lv 1104
+run  34: day  14.88  max stage  192  shards +445926  wall-clock   8.48 h  hero lv 1104
+run  35: day  15.34  max stage  194  shards +520128  wall-clock  11.05 h  hero lv 1121
+run  36: day  15.72  max stage  196  shards +606678  wall-clock   8.98 h  hero lv 1120
+run  37: day  15.89  max stage  194  shards +520128  wall-clock   4.10 h  hero lv 1101
+run  38: day  16.53  max stage  198  shards +707629  wall-clock  15.42 h  hero lv 1132
+run  39: day  16.88  max stage  198  shards +707629  wall-clock   8.29 h  hero lv 1135
+run  40: day  17.34  max stage  202  shards +962721  wall-clock  11.18 h  hero lv 1157
+run  41: day  17.71  max stage  201  shards +891409  wall-clock   8.82 h  hero lv 1147
+run  42: day  17.88  max stage  201  shards +891409  wall-clock   4.00 h  hero lv 1151
+run  43: day  18.34  max stage  206  shards +1309772  wall-clock  11.21 h  hero lv 1176
+run  44: day  18.72  max stage  206  shards +1309772  wall-clock   8.95 h  hero lv 1175
+run  45: day  18.89  max stage  207  shards +1414554  wall-clock   4.10 h  hero lv 1179
+run  46: day  19.52  max stage  209  shards +1649936  wall-clock  15.23 h  hero lv 1197
+run  47: day  19.72  max stage  209  shards +1649936  wall-clock   4.68 h  hero lv 1194
+run  48: day  19.89  max stage  211  shards +1924485  wall-clock   4.12 h  hero lv 1201
+run  49: day  20.53  max stage  214  shards +2424297  wall-clock  15.32 h  hero lv 1223
+run  50: day  20.72  max stage  215  shards +2618241  wall-clock   4.71 h  hero lv 1227
+run  51: day  20.89  max stage  216  shards +2827700  wall-clock   4.08 h  hero lv 1231
+run  52: day  21.53  max stage  217  shards +3053916  wall-clock  15.22 h  hero lv 1242
+run  53: day  21.88  max stage  219  shards +3562088  wall-clock   8.37 h  hero lv 1250
+run  54: day  22.34  max stage  222  shards +4487205  wall-clock  11.20 h  hero lv 1269
+run  55: day  22.72  max stage  223  shards +4846181  wall-clock   8.96 h  hero lv 1275
+run  56: day  22.89  max stage  224  shards +5233876  wall-clock   4.15 h  hero lv 1279
+run  57: day  23.52  max stage  225  shards +5652586  wall-clock  15.19 h  hero lv 1283
+run  58: day  23.72  max stage  227  shards +6593176  wall-clock   4.72 h  hero lv 1297
+run  59: day  24.34  max stage  230  shards +8305503  wall-clock  14.78 h  hero lv 1312
+run  60: day  24.71  max stage  231  shards +8969943  wall-clock   9.00 h  hero lv 1319
+run  61: day  24.88  max stage  232  shards +9687539  wall-clock   4.18 h  hero lv 1326
+run  62: day  25.34  max stage  233  shards +10462542  wall-clock  11.05 h  hero lv 1335
+run  63: day  25.72  max stage  235  shards +12203509  wall-clock   8.95 h  hero lv 1344
+run  64: day  25.89  max stage  236  shards +13179790  wall-clock   4.16 h  hero lv 1352
+run  65: day  26.53  max stage  239  shards +16602740  wall-clock  15.41 h  hero lv 1367
+run  66: day  26.88  max stage  240  shards +17930959  wall-clock   8.39 h  hero lv 1374
+run  67: day  27.34  max stage  241  shards +19365436  wall-clock  11.07 h  hero lv 1382
+run  68: day  27.72  max stage  243  shards +22587844  wall-clock   8.99 h  hero lv 1391
+run  69: day  27.89  max stage  243  shards +22587844  wall-clock   4.16 h  hero lv 1394
+run  70: day  28.71  max stage  247  shards +30730513  wall-clock  19.64 h  hero lv 1414
+run  71: day  28.88  max stage  245  shards +26346462  wall-clock   4.00 h  hero lv 1402
+run  72: day  29.34  max stage  249  shards +35844070  wall-clock  11.00 h  hero lv 1427
+run  73: day  29.71  max stage  251  shards +41808524  wall-clock   9.00 h  hero lv 1439
+run  74: day  29.88  max stage  251  shards +41808524  wall-clock   4.14 h  hero lv 1442
+final artifacts: {'heart': 83, 'gauntlet': 86, 'crown': 82, 'hourglass': 10, 'moonwell': 29, 'wings': 12} current stage 248
